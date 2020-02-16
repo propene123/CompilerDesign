@@ -1,0 +1,7 @@
+1. Parse input file into respective lists
+2. Determine grammar rules
+3. Prettify Grammar
+4. Output Grammar
+5. Validate formula
+6. Plot Parse-Tree
+7. Log errors

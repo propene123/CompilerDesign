@@ -7,3 +7,6 @@
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/381d6ba/
 CompilerDesign	README.md	/^# CompilerDesign/;"	c
+fileDict	src/compiler.py	/^fileDict = readInFile(inFile)$/;"	v
+inFile	src/compiler.py	/^inFile = sys.argv[1]$/;"	v
+readInFile	src/compiler.py	/^def readInFile(fileName):$/;"	f
