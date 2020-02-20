@@ -13,6 +13,7 @@ VARIABLES = []
 CONSTANTS = []
 PREDICATES = []
 FORMULA = ''
+TOKENS = []
 
 
 def validate_var(var):
@@ -109,11 +110,17 @@ def parse_predicates(line_split, sym_table):
                 sym_table[name] = ['PREDICATE', count]
 
 
-def parse_formula(line_split):
+def parse_formula(lines, count):
     global FORMULA
-    if len(line_split) != 2:
-        sys.exit('You must specifiy as formula')
-    FORMULA = ''.join(line_split[1].split())
+    split = lines[count].split(':')
+    if len(split) != 2:
+        sys.exit('You must specify a formula in the input file')
+    FORMULA = ''.join(split[1].split())
+    for i in range(count + 1, len(lines)):
+        if len(lines[i].split(':')) == 1:
+            FORMULA += ''.join(lines[i].split())
+        else:
+            break
 
 
 def read_in_file(file_name, sym_table):
@@ -122,6 +129,7 @@ def read_in_file(file_name, sym_table):
             lines = list(in_file)
     except IOError:
         sys.exit('Could not open input file.')
+    count = 0
     for line in lines:
         line_split = line.split(':')
         if line_split[0].strip() == 'variables':
@@ -137,7 +145,8 @@ def read_in_file(file_name, sym_table):
         elif line_split[0].strip() == 'predicates':
             parse_predicates(line_split, sym_table)
         elif line_split[0].strip() == 'formula':
-            parse_formula(line_split)
+            parse_formula(lines, count)
+        count += 1
 
 
 def print_constants():
@@ -220,30 +229,6 @@ def generate_grammar_lists(sym_table):
 def match(terminal):
     global LOOKAHEAD, LOOKAHEAD_INDEX
     LOOKAHEAD = FORMULA[LOOKAHEAD_INDEX]
-    if terminal == 'VARIABLE':
-        if LOOKAHEAD not in VARIABLES:
-            sys.exit('Syntax Error')
-        LOOKAHEAD_INDEX += 1
-    if terminal == 'CONSTANT':
-        if LOOKAHEAD not in CONSTANTS:
-            sys.exit('Syntax Error')
-        LOOKAHEAD_INDEX += 1
-    if terminal == 'QUANTIFIER':
-        if LOOKAHEAD not in QUANTIFIERS:
-            sys.exit('Syntax Error')
-        LOOKAHEAD_INDEX += 1
-    if terminal == 'CONNECTIVE':
-        if LOOKAHEAD not in CONNECTIVES:
-            sys.exit('Syntax Error')
-        LOOKAHEAD_INDEX += 1
-    if terminal == 'PREDICATE':
-        if LOOKAHEAD not in PREDICATES:
-            sys.exit('Syntax Error')
-        LOOKAHEAD_INDEX += 1
-    else:
-        if LOOKAHEAD != terminal:
-            sys.exit('Syntax Error')
-        LOOKAHEAD_INDEX += 1
 
 
 def predicate_rule(sym_table):
@@ -256,6 +241,8 @@ def predicate_rule(sym_table):
             match(',')
         match('VARIABLE')
         match(')')
+    else:
+        sys.exit('Syntax Error. Predicate')
 
 
 def const_var():
@@ -264,7 +251,7 @@ def const_var():
     elif LOOKAHEAD in VARIABLES:
         match('VARIABLE')
     else:
-        sys.exit('Syntax Error')
+        sys.exit('Syntax Error. Const Var')
 
 
 def atom(sym_table):
@@ -276,7 +263,7 @@ def atom(sym_table):
     elif LOOKAHEAD in PREDICATES:
         predicate_rule(sym_table)
     else:
-        sys.exit('Syntax Error')
+        sys.exit('Syntax Error. Atom')
 
 
 def formula(sym_table):
@@ -294,7 +281,7 @@ def formula(sym_table):
         match('QUANTIFIER')
         formula(sym_table)
     else:
-        sys.exit('Syntax Error')
+        sys.exit('Syntax Error. Formula')
     return True
 
 
@@ -306,5 +293,5 @@ SYM_TABLE.update({'[': ['FORBIDDEN'], ']': ['FORBIDDEN']})
 INFILE = sys.argv[1]
 read_in_file(INFILE, SYM_TABLE)
 generate_grammar_lists(SYM_TABLE)
-print(FORMULA)
+lex_analysis()
 formula(SYM_TABLE)
