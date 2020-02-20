@@ -3,6 +3,14 @@ import re
 
 CONNSTRINGS = ['AND', 'OR', 'IMPLIES', 'IFF', 'NOT']
 QSTRINGS = ['EXISTS', 'FORALL']
+LOOKAHEAD = ''
+EQUALITY = ''
+NEGATION = ''
+CONNECTIVES = []
+QUANTIFIERS = []
+VARIABLES = []
+CONSTANTS = []
+PREDICATES = []
 
 
 def validate_var(var):
@@ -121,6 +129,124 @@ def read_in_file(file_name, sym_table):
             parse_predicates(line_split, sym_table)
 
 
+def print_constants():
+    print('Constant -> ', end='')
+    for i in range(len(CONSTANTS)-1):
+        print(CONSTANTS[i], end='|')
+    print(CONSTANTS[-1])
+
+
+def print_variables():
+    print('Variable -> ', end='')
+    for i in range(len(VARIABLES)-1):
+        print(VARIABLES[i], end='|')
+    print(VARIABLES[-1])
+
+
+def print_predicates(sym_table):
+    for pred in PREDICATES:
+        print(f'{pred}_rule -> {pred}(', end='')
+        for _ in range(int(sym_table[pred][1])-1):
+            print('variable', end=',')
+        print('variable)')
+    print('Predicate_rule -> ', end='')
+    for i in range(len(PREDICATES)-1):
+        print(f'{PREDICATES[i]}_rule', end='|')
+    print(f'{PREDICATES[-1]}_rule')
+
+
+def print_quantifiers():
+    print('Quantifier -> ', end='')
+    for i in range(len(QUANTIFIERS)-1):
+        print(QUANTIFIERS[i], end='|')
+    print(QUANTIFIERS[-1])
+
+
+def print_connectives():
+    print('Connective -> ', end='')
+    for i in range(len(CONNECTIVES)-1):
+        print(CONNECTIVES[i], end='|')
+    print(CONNECTIVES[-1])
+
+
+def print_formulae():
+    print('Atom -> Predicate_rule|(ConstantEqualityConstant)|' +
+          '(ConstantEqualityVariable)|' +
+          '(VariableEqualityConstant)|(VariableEqualityVariable)')
+    print('Formula -> Atom|(FormulaConnectiveFormula)|' +
+          'NegationFormula|QuantifierFormula')
+
+
+def generate_grammar_lists(sym_table):
+    global CONSTANTS, VARIABLES, PREDICATES, EQUALITY, QUANTIFIERS, NEGATION
+    for sym, attrib in sym_table.items():
+        if attrib[0] == 'CONSTANT':
+            CONSTANTS.append(sym)
+        elif attrib[0] == 'VARIABLE':
+            VARIABLES.append(sym)
+        elif attrib[0] == 'PREDICATE':
+            PREDICATES.append(sym)
+        elif attrib[0] == 'EQUALITY':
+            EQUALITY = sym
+        elif attrib[0] == 'QUANTIFIER':
+            QUANTIFIERS.append(sym)
+        elif attrib[0] == 'CONNECTIVE':
+            if attrib[1] == 'NOT':
+                NEGATION = sym
+            else:
+                CONNECTIVES.append(sym)
+    print('Grammar rules for the first order logic language.')
+    print_constants()
+    print_variables()
+    print_predicates(sym_table)
+    print('Equality ->', EQUALITY)
+    print_quantifiers()
+    print_connectives()
+    print('Negation ->', NEGATION)
+    print_formulae()
+
+
+def const_var():
+    if LOOKAHEAD in CONSTANTS:
+        match('CONSTANT')
+    elif LOOKAHEAD in VARIABLES:
+        match('VARIABLE')
+    else:
+        sys.exit('Syntax Error')
+
+
+def atom():
+    if LOOKAHEAD == '(':
+        match('(')
+        const_var()
+        match('EQUALITY')
+        match(')')
+    elif LOOKAHEAD in PREDICATES:
+        match('PREDICATE')
+        predicate_rule()
+    else:
+        sys.exit('Syntax Error')
+
+
+def formula():
+    if LOOKAHEAD == '(':
+        if not atom():
+            match('(')
+            formula()
+            match('CONNECTIVE')
+            formula()
+            match(')')
+    elif LOOKAHEAD == NEGATION:
+        match('NEGATION')
+        formula()
+    elif LOOKAHEAD in QUANTIFIERS:
+        match('QUANTIFIER')
+        formula()
+    else:
+        sys.exit('Syntax Error')
+    return True
+
+
 if len(sys.argv) < 2:
     sys.exit('no input file specified')
 SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [
@@ -128,4 +254,4 @@ SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [
 SYM_TABLE.update({'[': ['FORBIDDEN'], ']': ['FORBIDDEN']})
 INFILE = sys.argv[1]
 read_in_file(INFILE, SYM_TABLE)
-print(SYM_TABLE)
+generate_grammar_lists(SYM_TABLE)
