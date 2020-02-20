@@ -206,6 +206,18 @@ def generate_grammar_lists(sym_table):
     print_formulae()
 
 
+def predicate_rule(sym_table):
+    if LOOKAHEAD in PREDICATES:
+        count = sym_table[LOOKAHEAD][1]
+        match('PREDICATE')
+        match('(')
+        for i in range(count-1):
+            match('VARIABLE')
+            match(',')
+        match('VARIABLE')
+        match(')')
+
+
 def const_var():
     if LOOKAHEAD in CONSTANTS:
         match('CONSTANT')
@@ -215,22 +227,21 @@ def const_var():
         sys.exit('Syntax Error')
 
 
-def atom():
+def atom(sym_table):
     if LOOKAHEAD == '(':
         match('(')
         const_var()
         match('EQUALITY')
         match(')')
     elif LOOKAHEAD in PREDICATES:
-        match('PREDICATE')
-        predicate_rule()
+        predicate_rule(sym_table)
     else:
         sys.exit('Syntax Error')
 
 
-def formula():
+def formula(sym_table):
     if LOOKAHEAD == '(':
-        if not atom():
+        if not atom(sym_table):
             match('(')
             formula()
             match('CONNECTIVE')
