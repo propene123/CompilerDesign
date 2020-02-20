@@ -1,0 +1,14 @@
+keke
+Grammar rules for the first order logic language.
+Constant -> C|D
+Variable -> w|x|y|z
+_6765ghhfvf_rule -> _6765ghhfvf(variable,variable)
+pred2_rule -> pred2(variable,variable,variable)
+Predicate_rule -> _6765ghhfvf_rule|pred2_rule
+Equality -> =
+Quantifier -> \exists|\forall
+Connective -> \land|\lor|\implies|\iff
+Negation -> \neg
+Atom -> Predicate_rule|(ConstantEqualityConstant)|(ConstantEqualityVariable)|(VariableEqualityConstant)|(VariableEqualityVariable)
+Formula -> Atom|(FormulaConnectiveFormula)|NegationFormula|QuantifierFormula
+

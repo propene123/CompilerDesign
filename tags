@@ -6,7 +6,40 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/381d6ba/
+CONNECTIVES	src/compiler.py	/^CONNECTIVES = []$/;"	v
+CONNSTRINGS	src/compiler.py	/^CONNSTRINGS = ['AND', 'OR', 'IMPLIES', 'IFF', 'NOT']$/;"	v
+CONSTANTS	src/compiler.py	/^CONSTANTS = []$/;"	v
 CompilerDesign	README.md	/^# CompilerDesign/;"	c
-fileDict	src/compiler.py	/^fileDict = readInFile(inFile)$/;"	v
-inFile	src/compiler.py	/^inFile = sys.argv[1]$/;"	v
-readInFile	src/compiler.py	/^def readInFile(fileName):$/;"	f
+EQUALITY	src/compiler.py	/^EQUALITY = ''$/;"	v
+FORMULA	src/compiler.py	/^FORMULA = ''$/;"	v
+INFILE	src/compiler.py	/^INFILE = sys.argv[1]$/;"	v
+LOOKAHEAD	src/compiler.py	/^LOOKAHEAD = ''$/;"	v
+LOOKAHEAD_INDEX	src/compiler.py	/^LOOKAHEAD_INDEX = 0$/;"	v
+NEGATION	src/compiler.py	/^NEGATION = ''$/;"	v
+PREDICATES	src/compiler.py	/^PREDICATES = []$/;"	v
+QSTRINGS	src/compiler.py	/^QSTRINGS = ['EXISTS', 'FORALL']$/;"	v
+QUANTIFIERS	src/compiler.py	/^QUANTIFIERS = []$/;"	v
+SYM_TABLE	src/compiler.py	/^SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [$/;"	v
+TOKENS	src/compiler.py	/^TOKENS = []$/;"	v
+VARIABLES	src/compiler.py	/^VARIABLES = []$/;"	v
+atom	src/compiler.py	/^def atom(sym_table):$/;"	f
+const_var	src/compiler.py	/^def const_var():$/;"	f
+formula	src/compiler.py	/^def formula(sym_table):$/;"	f
+generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
+match	src/compiler.py	/^def match(terminal):$/;"	f
+parse_connectives	src/compiler.py	/^def parse_connectives(line_split, sym_table):$/;"	f
+parse_constants	src/compiler.py	/^def parse_constants(line_split, sym_table):$/;"	f
+parse_equality	src/compiler.py	/^def parse_equality(line_split, sym_table):$/;"	f
+parse_formula	src/compiler.py	/^def parse_formula(lines, count):$/;"	f
+parse_predicates	src/compiler.py	/^def parse_predicates(line_split, sym_table):$/;"	f
+parse_quantifiers	src/compiler.py	/^def parse_quantifiers(line_split, sym_table):$/;"	f
+parse_variables	src/compiler.py	/^def parse_variables(line_split, sym_table):$/;"	f
+predicate_rule	src/compiler.py	/^def predicate_rule(sym_table):$/;"	f
+print_connectives	src/compiler.py	/^def print_connectives():$/;"	f
+print_constants	src/compiler.py	/^def print_constants():$/;"	f
+print_formulae	src/compiler.py	/^def print_formulae():$/;"	f
+print_predicates	src/compiler.py	/^def print_predicates(sym_table):$/;"	f
+print_quantifiers	src/compiler.py	/^def print_quantifiers():$/;"	f
+print_variables	src/compiler.py	/^def print_variables():$/;"	f
+read_in_file	src/compiler.py	/^def read_in_file(file_name, sym_table):$/;"	f
+validate_var	src/compiler.py	/^def validate_var(var):$/;"	f
