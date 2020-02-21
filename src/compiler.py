@@ -235,6 +235,7 @@ def match_set(sym_set, index):
                 current_match = sym
     return current_match
 
+
 def lex_analysis():
     global TOKENS
     i = 0
@@ -257,7 +258,7 @@ def lex_analysis():
             candidates.append([match_set(PREDICATES, i), 'PREDICATE'])
             candidates.append([match_set([EQUALITY], i), 'EQUALITY'])
             candidates.append([match_set([NEGATION], i), 'NEGATION'])
-            candidates.sort(key=lambda item: len(item[0]), reverse = True)
+            candidates.sort(key=lambda item: len(item[0]), reverse=True)
             if len(candidates[0][0]) == 0:
                 sys.exit('Formula contains invalid identifiers')
             else:
@@ -265,17 +266,23 @@ def lex_analysis():
                 i += len(candidates[0][0])
 
 
-
 def match(terminal):
     global LOOKAHEAD_INDEX
-    LOOKAHEAD = FORMULA[LOOKAHEAD_INDEX]
+    if LOOKAHEAD_INDEX == len(TOKENS):
+        sys.exit(f'Syntax Error. Expected {terminal} at pos' +
+                 f' {LOOKAHEAD_INDEX}. Instead found nothing.')
     if terminal == TOKENS[LOOKAHEAD_INDEX][0]:
         LOOKAHEAD_INDEX += 1
     else:
-        sys.exit('Syntax Error')
+        sys.exit(f'Syntax Error. Expected {terminal} at pos ' +
+                 f'{LOOKAHEAD_INDEX} instead found' +
+                 f' {TOKENS[LOOKAHEAD_INDEX]}')
 
 
 def predicate_rule(sym_table):
+    if LOOKAHEAD_INDEX == len(TOKENS):
+        sys.exit(f'Syntax Error. Expected Predicate at pos {LOOKAHEAD_INDEX}' +
+                 f'. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         count = int(sym_table[TOKENS[LOOKAHEAD_INDEX][1]][1])
         match('PREDICATE')
@@ -286,19 +293,29 @@ def predicate_rule(sym_table):
         match('VARIABLE')
         match(')')
     else:
-        sys.exit('Syntax Error. Predicate')
+        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                 f' in Predicate found at pos {LOOKAHEAD_INDEX}' +
+                 f' expected Predicate')
 
 
 def const_var():
+    if LOOKAHEAD_INDEX == len(TOKENS):
+        sys.exit(f'Syntax Error. Expected Variable or Constant at pos' +
+                 f' {LOOKAHEAD_INDEX}. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'CONSTANT':
         match('CONSTANT')
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'VARIABLE':
         match('VARIABLE')
     else:
-        sys.exit('Syntax Error. Const Var')
+        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                 f' in Atom at pos {LOOKAHEAD_INDEX} expected Variable or' +
+                 f' Constant')
 
 
 def atom(sym_table):
+    if LOOKAHEAD_INDEX == len(TOKENS):
+        sys.exit(f'Syntax Error. Expected Atom at pos {LOOKAHEAD_INDEX}.' +
+                 f' Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
         match('(')
         const_var()
@@ -308,13 +325,26 @@ def atom(sym_table):
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         predicate_rule(sym_table)
     else:
-        sys.exit('Syntax Error. Atom')
+        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                 f' in Atom at pos {LOOKAHEAD_INDEX} expected ( or Predicate')
 
 
 def formula(sym_table):
+    if LOOKAHEAD_INDEX == len(TOKENS):
+        sys.exit(f'Syntax Error. Expected Formula at pos {LOOKAHEAD_INDEX}.' +
+                 f' Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
-        if LOOKAHEAD_INDEX < len(TOKENS)-1 and (TOKENS[LOOKAHEAD_INDEX+1][0] == 'VARIABLE' or TOKENS[LOOKAHEAD_INDEX+1][0] == 'CONSTANT'):
-            atom(sym_table)
+        if LOOKAHEAD_INDEX < len(TOKENS)-1:
+            if TOKENS[LOOKAHEAD_INDEX+1][0] == 'VARIABLE':
+                atom(sym_table)
+            if TOKENS[LOOKAHEAD_INDEX+1][0] == 'CONSTANT':
+                atom(sym_table)
+            else:
+                match('(')
+                formula(sym_table)
+                match('CONNECTIVE')
+                formula(sym_table)
+                match(')')
         else:
             match('(')
             formula(sym_table)
@@ -331,7 +361,10 @@ def formula(sym_table):
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         atom(sym_table)
     else:
-        sys.exit('Syntax Error. Formula')
+        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                 f' in Formula at pos {LOOKAHEAD_INDEX} expected ( or' +
+                 f' Variable or Constant or Negation or Quantifier or' +
+                 f' PREDICATE')
     return True
 
 

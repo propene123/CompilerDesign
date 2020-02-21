@@ -13,7 +13,6 @@ CompilerDesign	README.md	/^# CompilerDesign/;"	c
 EQUALITY	src/compiler.py	/^EQUALITY = ''$/;"	v
 FORMULA	src/compiler.py	/^FORMULA = ''$/;"	v
 INFILE	src/compiler.py	/^INFILE = sys.argv[1]$/;"	v
-LOOKAHEAD	src/compiler.py	/^LOOKAHEAD = ''$/;"	v
 LOOKAHEAD_INDEX	src/compiler.py	/^LOOKAHEAD_INDEX = 0$/;"	v
 NEGATION	src/compiler.py	/^NEGATION = ''$/;"	v
 PREDICATES	src/compiler.py	/^PREDICATES = []$/;"	v
@@ -26,7 +25,9 @@ atom	src/compiler.py	/^def atom(sym_table):$/;"	f
 const_var	src/compiler.py	/^def const_var():$/;"	f
 formula	src/compiler.py	/^def formula(sym_table):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
+lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 match	src/compiler.py	/^def match(terminal):$/;"	f
+match_set	src/compiler.py	/^def match_set(sym_set, index):$/;"	f
 parse_connectives	src/compiler.py	/^def parse_connectives(line_split, sym_table):$/;"	f
 parse_constants	src/compiler.py	/^def parse_constants(line_split, sym_table):$/;"	f
 parse_equality	src/compiler.py	/^def parse_equality(line_split, sym_table):$/;"	f
