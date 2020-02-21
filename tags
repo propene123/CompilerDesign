@@ -15,15 +15,18 @@ FORMULA	src/compiler.py	/^FORMULA = ''$/;"	v
 INFILE	src/compiler.py	/^INFILE = sys.argv[1]$/;"	v
 LOOKAHEAD_INDEX	src/compiler.py	/^LOOKAHEAD_INDEX = 0$/;"	v
 NEGATION	src/compiler.py	/^NEGATION = ''$/;"	v
+NODE_ID	src/compiler.py	/^NODE_ID = 0$/;"	v
 PREDICATES	src/compiler.py	/^PREDICATES = []$/;"	v
 QSTRINGS	src/compiler.py	/^QSTRINGS = ['EXISTS', 'FORALL']$/;"	v
 QUANTIFIERS	src/compiler.py	/^QUANTIFIERS = []$/;"	v
 SYM_TABLE	src/compiler.py	/^SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [$/;"	v
+TERM_NODES	src/compiler.py	/^TERM_NODES = []$/;"	v
 TOKENS	src/compiler.py	/^TOKENS = []$/;"	v
 VARIABLES	src/compiler.py	/^VARIABLES = []$/;"	v
-atom	src/compiler.py	/^def atom(sym_table):$/;"	f
-const_var	src/compiler.py	/^def const_var():$/;"	f
-formula	src/compiler.py	/^def formula(sym_table):$/;"	f
+atom	src/compiler.py	/^def atom(sym_table, graph, parent_id):$/;"	f
+const_var	src/compiler.py	/^def const_var(graph, parent_id):$/;"	f
+escape_bslash	src/compiler.py	/^def escape_bslash(string):$/;"	f
+formula	src/compiler.py	/^def formula(sym_table, graph, parent_id):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 match	src/compiler.py	/^def match(terminal):$/;"	f
@@ -35,7 +38,8 @@ parse_formula	src/compiler.py	/^def parse_formula(lines, count):$/;"	f
 parse_predicates	src/compiler.py	/^def parse_predicates(line_split, sym_table):$/;"	f
 parse_quantifiers	src/compiler.py	/^def parse_quantifiers(line_split, sym_table):$/;"	f
 parse_variables	src/compiler.py	/^def parse_variables(line_split, sym_table):$/;"	f
-predicate_rule	src/compiler.py	/^def predicate_rule(sym_table):$/;"	f
+pgraph	src/compiler.py	/^pgraph = pydot.Dot(graph_type='graph', rankdir='TB')$/;"	v
+predicate_rule	src/compiler.py	/^def predicate_rule(sym_table, graph, parent_id):$/;"	f
 print_connectives	src/compiler.py	/^def print_connectives():$/;"	f
 print_constants	src/compiler.py	/^def print_constants():$/;"	f
 print_formulae	src/compiler.py	/^def print_formulae():$/;"	f
@@ -43,4 +47,5 @@ print_predicates	src/compiler.py	/^def print_predicates(sym_table):$/;"	f
 print_quantifiers	src/compiler.py	/^def print_quantifiers():$/;"	f
 print_variables	src/compiler.py	/^def print_variables():$/;"	f
 read_in_file	src/compiler.py	/^def read_in_file(file_name, sym_table):$/;"	f
+subgraph	src/compiler.py	/^subgraph = pydot.Subgraph(rank='same')$/;"	v
 validate_var	src/compiler.py	/^def validate_var(var):$/;"	f
