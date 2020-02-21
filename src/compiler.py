@@ -3,7 +3,6 @@ import re
 
 CONNSTRINGS = ['AND', 'OR', 'IMPLIES', 'IFF', 'NOT']
 QSTRINGS = ['EXISTS', 'FORALL']
-LOOKAHEAD = ''
 LOOKAHEAD_INDEX = 0
 EQUALITY = ''
 NEGATION = ''
@@ -116,6 +115,8 @@ def parse_formula(lines, count):
     if len(split) != 2:
         sys.exit('You must specify a formula in the input file')
     FORMULA = ''.join(split[1].split())
+    if len(FORMULA) == 0:
+        sys.exit('You must specify a formula in the input file')
     for i in range(count + 1, len(lines)):
         if len(lines[i].split(':')) == 1:
             FORMULA += ''.join(lines[i].split())
@@ -226,14 +227,57 @@ def generate_grammar_lists(sym_table):
     print_formulae()
 
 
+def match_set(sym_set, index):
+    current_match = ''
+    for sym in sym_set:
+        if FORMULA[index:].find(sym) == 0:
+            if len(sym) > len(current_match):
+                current_match = sym
+    return current_match
+
+def lex_analysis():
+    global TOKENS
+    i = 0
+    while i < len(FORMULA):
+        if FORMULA[i] == '(':
+            TOKENS.append(['('])
+            i += 1
+        elif FORMULA[i] == ')':
+            TOKENS.append([')'])
+            i += 1
+        elif FORMULA[i] == ',':
+            TOKENS.append([','])
+            i += 1
+        else:
+            candidates = []
+            candidates.append([match_set(CONNECTIVES, i), 'CONNECTIVE'])
+            candidates.append([match_set(VARIABLES, i), 'VARIABLE'])
+            candidates.append([match_set(CONSTANTS, i), 'CONSTANT'])
+            candidates.append([match_set(QUANTIFIERS, i), 'QUANTIFIER'])
+            candidates.append([match_set(PREDICATES, i), 'PREDICATE'])
+            candidates.append([match_set([EQUALITY], i), 'EQUALITY'])
+            candidates.append([match_set([NEGATION], i), 'NEGATION'])
+            candidates.sort(key=lambda item: len(item[0]), reverse = True)
+            if len(candidates[0][0]) == 0:
+                sys.exit('Formula contains invalid identifiers')
+            else:
+                TOKENS.append([candidates[0][1], candidates[0][0]])
+                i += len(candidates[0][0])
+
+
+
 def match(terminal):
-    global LOOKAHEAD, LOOKAHEAD_INDEX
+    global LOOKAHEAD_INDEX
     LOOKAHEAD = FORMULA[LOOKAHEAD_INDEX]
+    if terminal == TOKENS[LOOKAHEAD_INDEX][0]:
+        LOOKAHEAD_INDEX += 1
+    else:
+        sys.exit('Syntax Error')
 
 
 def predicate_rule(sym_table):
-    if LOOKAHEAD in PREDICATES:
-        count = sym_table[LOOKAHEAD][1]
+    if TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
+        count = int(sym_table[TOKENS[LOOKAHEAD_INDEX][1]][1])
         match('PREDICATE')
         match('(')
         for _ in range(count-1):
@@ -246,40 +290,46 @@ def predicate_rule(sym_table):
 
 
 def const_var():
-    if LOOKAHEAD in CONSTANTS:
+    if TOKENS[LOOKAHEAD_INDEX][0] == 'CONSTANT':
         match('CONSTANT')
-    elif LOOKAHEAD in VARIABLES:
+    elif TOKENS[LOOKAHEAD_INDEX][0] == 'VARIABLE':
         match('VARIABLE')
     else:
         sys.exit('Syntax Error. Const Var')
 
 
 def atom(sym_table):
-    if LOOKAHEAD == '(':
+    if TOKENS[LOOKAHEAD_INDEX][0] == '(':
         match('(')
         const_var()
         match('EQUALITY')
+        const_var()
         match(')')
-    elif LOOKAHEAD in PREDICATES:
+    elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         predicate_rule(sym_table)
     else:
         sys.exit('Syntax Error. Atom')
 
 
 def formula(sym_table):
-    if LOOKAHEAD == '(':
-        if not atom(sym_table):
+    if TOKENS[LOOKAHEAD_INDEX][0] == '(':
+        if LOOKAHEAD_INDEX < len(TOKENS)-1 and (TOKENS[LOOKAHEAD_INDEX+1][0] == 'VARIABLE' or TOKENS[LOOKAHEAD_INDEX+1][0] == 'CONSTANT'):
+            atom(sym_table)
+        else:
             match('(')
             formula(sym_table)
             match('CONNECTIVE')
             formula(sym_table)
             match(')')
-    elif LOOKAHEAD == NEGATION:
+    elif TOKENS[LOOKAHEAD_INDEX][0] == 'NEGATION':
         match('NEGATION')
         formula(sym_table)
-    elif LOOKAHEAD in QUANTIFIERS:
+    elif TOKENS[LOOKAHEAD_INDEX][0] == 'QUANTIFIER':
         match('QUANTIFIER')
+        match('VARIABLE')
         formula(sym_table)
+    elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
+        atom(sym_table)
     else:
         sys.exit('Syntax Error. Formula')
     return True
@@ -295,3 +345,5 @@ read_in_file(INFILE, SYM_TABLE)
 generate_grammar_lists(SYM_TABLE)
 lex_analysis()
 formula(SYM_TABLE)
+if LOOKAHEAD_INDEX != len(TOKENS):
+    sys.exit('Syntax error trailing symbols at end of formula')
