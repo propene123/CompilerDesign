@@ -1,7 +1,7 @@
 variables: w x y z
 constants: C D
 predicates: P[2] Q[1]
-equality: equa
-connectives: \land \lor \implies \iff \neg
-quantifiers: \exists \forall
-formula: (\forall z \exists y (P(x,z)\impliesQ(w))\implies(Cequax))
+equality: =
+connectives: \land \lor \implies \iff NOT
+quantifiers: \forall \exists
+formula: ( ( \forallx\existsy(x = y)  \implies  NOT\existsx (x = D)  ) \land \forallx\forally(y = x) )

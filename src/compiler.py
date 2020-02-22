@@ -175,8 +175,8 @@ def print_predicates(sym_table):
     for pred in PREDICATES:
         print(f'{pred}_rule -> {pred}(', end='')
         for _ in range(int(sym_table[pred][1])-1):
-            print('variable', end=',')
-        print('variable)')
+            print('Variable', end=',')
+        print('Variable)')
     print('Predicate_rule -> ', end='')
     for i in range(len(PREDICATES)-1):
         print(f'{PREDICATES[i]}_rule', end='|')
