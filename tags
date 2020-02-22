@@ -47,5 +47,5 @@ print_predicates	src/compiler.py	/^def print_predicates(sym_table):$/;"	f
 print_quantifiers	src/compiler.py	/^def print_quantifiers():$/;"	f
 print_variables	src/compiler.py	/^def print_variables():$/;"	f
 read_in_file	src/compiler.py	/^def read_in_file(file_name, sym_table):$/;"	f
-subgraph	src/compiler.py	/^subgraph = pydot.Subgraph(rank='same')$/;"	v
+subgraph	src/compiler.py	/^subgraph = pydot.Subgraph(rank='max')$/;"	v
 validate_var	src/compiler.py	/^def validate_var(var):$/;"	f
