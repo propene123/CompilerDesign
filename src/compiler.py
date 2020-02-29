@@ -275,8 +275,8 @@ def lex_analysis():
 
 def add_tree(graph, label, parent_id):
     global NODE_ID
-    if (label == 'Quantifier' or 'Connective' or 'Variable' or
-            'Constant' or 'Predicate'):
+    if (label in ('Quantifier', 'Connective', 'Variable',
+                  'Constant', 'Predicate', 'Negation', 'Equality')):
         graph.add_node(pydot.Node(NODE_ID, label=label))
         graph.add_edge(pydot.Edge(parent_id, NODE_ID))
         NODE_ID += 1
@@ -284,6 +284,11 @@ def add_tree(graph, label, parent_id):
             NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
         graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
         TERM_NODES.append(NODE_ID)
+        NODE_ID += 1
+    elif label == 'Formula':
+        graph.add_node(pydot.Node(NODE_ID, label=label))
+        if parent_id > -1:
+            graph.add_edge(pydot.Edge(parent_id, NODE_ID))
         NODE_ID += 1
     else:
         graph.add_node(pydot.Node(NODE_ID, label=f'"{escape_bslash(label)}"'))
@@ -306,55 +311,31 @@ def match(terminal):
 
 def predicate_rule(sym_table, graph, parent_id):
     global NODE_ID
-    graph.add_node(pydot.Node(NODE_ID, label='Predicate'))
-    graph.add_edge(pydot.Edge(parent_id, NODE_ID))
-    start_id = NODE_ID
-    NODE_ID += 1
     if LOOKAHEAD_INDEX == len(TOKENS):
         sys.exit(f'Syntax Error. Expected Predicate at pos {LOOKAHEAD_INDEX}' +
                  f'. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         count = int(sym_table[TOKENS[LOOKAHEAD_INDEX][1]][1])
         match('PREDICATE')
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Predicate', parent_id)
+        TERM_NODES.append(NODE_ID-1)
+        start_id = NODE_ID - 2
         match('(')
-        graph.add_node(pydot.Node(NODE_ID, label='('))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, '(', start_id)
+        TERM_NODES.append(NODE_ID-1)
         for _ in range(count-1):
-            graph.add_node(pydot.Node(NODE_ID, label='Variable'))
-            graph.add_edge(pydot.Edge(start_id, NODE_ID))
-            NODE_ID += 1
             match('VARIABLE')
-            graph.add_node(pydot.Node(
-                NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-            graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-            TERM_NODES.append(NODE_ID)
-            NODE_ID += 1
+            add_tree(graph, 'Variable', start_id)
+            TERM_NODES.append(NODE_ID-1)
             match(',')
-            graph.add_node(pydot.Node(NODE_ID, label='\,'))
-            graph.add_edge(pydot.Edge(start_id, NODE_ID))
-            TERM_NODES.append(NODE_ID)
-            NODE_ID += 1
+            add_tree(graph, ',', start_id)
+            TERM_NODES.append(NODE_ID-1)
         match('VARIABLE')
-        graph.add_node(pydot.Node(NODE_ID, label='Variable'))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        NODE_ID += 1
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Variable', start_id)
+        TERM_NODES.append(NODE_ID-1)
         match(')')
-        graph.add_node(pydot.Node(NODE_ID, label=')'))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, ')', start_id)
+        TERM_NODES.append(NODE_ID-1)
     else:
         sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
                  f' in Predicate found at pos {LOOKAHEAD_INDEX}' +
@@ -368,24 +349,12 @@ def const_var(graph, parent_id):
                  f' {LOOKAHEAD_INDEX}. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'CONSTANT':
         match('CONSTANT')
-        graph.add_node(pydot.Node(NODE_ID, label='Constant'))
-        graph.add_edge(pydot.Edge(parent_id, NODE_ID))
-        NODE_ID += 1
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Constant', parent_id)
+        TERM_NODES.append(NODE_ID-1)
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'VARIABLE':
         match('VARIABLE')
-        graph.add_node(pydot.Node(NODE_ID, label='VARIABLE'))
-        graph.add_edge(pydot.Edge(parent_id, NODE_ID))
-        NODE_ID += 1
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Variable', parent_id)
+        TERM_NODES.append(NODE_ID-1)
     else:
         sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
                  f' in Atom at pos {LOOKAHEAD_INDEX} expected Variable or' +
@@ -394,35 +363,23 @@ def const_var(graph, parent_id):
 
 def atom(sym_table, graph, parent_id):
     global NODE_ID, TERM_NODES
-    graph.add_node(pydot.Node(NODE_ID, label='Atom'))
-    graph.add_edge(pydot.Edge(parent_id, NODE_ID))
-    start_id = NODE_ID
-    NODE_ID += 1
+    add_tree(graph, 'Atom', parent_id)
+    start_id = NODE_ID - 1
     if LOOKAHEAD_INDEX == len(TOKENS):
         sys.exit(f'Syntax Error. Expected Atom at pos {LOOKAHEAD_INDEX}.' +
                  f' Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
         match('(')
-        graph.add_node(pydot.Node(NODE_ID, label='('))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, '(', start_id)
+        TERM_NODES.append(NODE_ID-1)
         const_var(graph, start_id)
         match('EQUALITY')
-        graph.add_node(pydot.Node(NODE_ID, label='Equality'))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        NODE_ID += 1
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(EQUALITY)}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Equality', start_id)
+        TERM_NODES.append(NODE_ID-1)
         const_var(graph, start_id)
         match(')')
-        graph.add_node(pydot.Node(NODE_ID, label=')'))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, ')', start_id)
+        TERM_NODES.append(NODE_ID-1)
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         predicate_rule(sym_table, graph, start_id)
     else:
@@ -432,94 +389,39 @@ def atom(sym_table, graph, parent_id):
 
 def formula(sym_table, graph, parent_id):
     global NODE_ID
-    graph.add_node(pydot.Node(NODE_ID, label='Formula'))
-    if parent_id > -1:
-        graph.add_edge(pydot.Edge(parent_id, NODE_ID))
-    start_id = NODE_ID
-    NODE_ID += 1
+    add_tree(graph, 'Formula', parent_id)
+    start_id = NODE_ID - 1
     if LOOKAHEAD_INDEX == len(TOKENS):
         sys.exit(f'Syntax Error. Expected Formula at pos {LOOKAHEAD_INDEX}.' +
                  f' Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
-        if LOOKAHEAD_INDEX < len(TOKENS)-1:
-            if TOKENS[LOOKAHEAD_INDEX+1][0] == 'VARIABLE':
-                atom(sym_table, graph, start_id)
-            elif TOKENS[LOOKAHEAD_INDEX+1][0] == 'CONSTANT':
-                atom(sym_table, graph, start_id)
-            else:
-                match('(')
-                graph.add_node(pydot.Node(NODE_ID, label='('))
-                graph.add_edge(pydot.Edge(start_id, NODE_ID))
-                TERM_NODES.append(NODE_ID)
-                NODE_ID += 1
-                formula(sym_table, graph, start_id)
-                match('CONNECTIVE')
-                graph.add_node(pydot.Node(NODE_ID, label='CONNECTIVE'))
-                graph.add_edge(pydot.Edge(start_id, NODE_ID))
-                NODE_ID += 1
-                graph.add_node(pydot.Node(
-                    NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-                graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-                TERM_NODES.append(NODE_ID)
-                NODE_ID += 1
-                formula(sym_table, graph, start_id)
-                match(')')
-                graph.add_node(pydot.Node(NODE_ID, label=')'))
-                graph.add_edge(pydot.Edge(start_id, NODE_ID))
-                TERM_NODES.append(NODE_ID)
-                NODE_ID += 1
+        if (LOOKAHEAD_INDEX < len(TOKENS)-1 and
+                (TOKENS[LOOKAHEAD_INDEX+1][0] in ('VARIABLE', 'CONSTANT'))):
+            atom(sym_table, graph, start_id)
         else:
             match('(')
-            graph.add_node(pydot.Node(NODE_ID, '('))
-            graph.add_edge(pydot.Edge(start_id, NODE_ID))
-            TERM_NODES.append(NODE_ID)
-            NODE_ID += 1
+            add_tree(graph, '(', start_id)
+            TERM_NODES.append(NODE_ID-1)
             formula(sym_table, graph, start_id)
             match('CONNECTIVE')
-            graph.add_node(pydot.Node(NODE_ID, label='Connective'))
-            graph.add_edge(pydot.Edge(start_id, NODE_ID))
-            NODE_ID += 1
-            graph.add_node(pydot.Node(
-                NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-            graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-            TERM_NODES.append(NODE_ID)
-            NODE_ID += 1
+            add_tree(graph, 'Connective', start_id)
+            TERM_NODES.append(NODE_ID-1)
             formula(sym_table, graph, start_id)
             match(')')
-            graph.add_node(pydot.Node(NODE_ID, label=')'))
-            graph.add_edge(pydot.Edge(start_id, NODE_ID))
-            TERM_NODES.append(NODE_ID)
-            NODE_ID += 1
+            add_tree(graph, ')', start_id)
+            TERM_NODES.append(NODE_ID-1)
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'NEGATION':
         match('NEGATION')
-        graph.add_node(pydot.Node(NODE_ID, label='Negation'))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        NODE_ID += 1
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Negation', start_id)
+        TERM_NODES.append(NODE_ID-1)
         formula(sym_table, graph, start_id)
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'QUANTIFIER':
         match('QUANTIFIER')
-        graph.add_node(pydot.Node(NODE_ID, label='Quantifier'))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        NODE_ID += 1
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Quantifier', start_id)
+        TERM_NODES.append(NODE_ID-1)
         match('VARIABLE')
-        graph.add_node(pydot.Node(NODE_ID, label='Variable'))
-        graph.add_edge(pydot.Edge(start_id, NODE_ID))
-        NODE_ID += 1
-        graph.add_node(pydot.Node(
-            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
-        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
-        TERM_NODES.append(NODE_ID)
-        NODE_ID += 1
+        add_tree(graph, 'Variable', start_id)
+        TERM_NODES.append(NODE_ID-1)
         formula(sym_table, graph, start_id)
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         atom(sym_table, graph, start_id)

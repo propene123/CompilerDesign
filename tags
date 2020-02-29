@@ -23,11 +23,13 @@ SYM_TABLE	src/compiler.py	/^SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [$/;"	v
 TERM_NODES	src/compiler.py	/^TERM_NODES = []$/;"	v
 TOKENS	src/compiler.py	/^TOKENS = []$/;"	v
 VARIABLES	src/compiler.py	/^VARIABLES = []$/;"	v
+add_tree	src/compiler.py	/^def add_tree(graph, label, parent_id):$/;"	f
 atom	src/compiler.py	/^def atom(sym_table, graph, parent_id):$/;"	f
 const_var	src/compiler.py	/^def const_var(graph, parent_id):$/;"	f
 escape_bslash	src/compiler.py	/^def escape_bslash(string):$/;"	f
 formula	src/compiler.py	/^def formula(sym_table, graph, parent_id):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
+lel	src/hmm.py	/^lel = 'crackpot'$/;"	v
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 match	src/compiler.py	/^def match(terminal):$/;"	f
 match_set	src/compiler.py	/^def match_set(sym_set, index):$/;"	f
