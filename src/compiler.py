@@ -273,6 +273,24 @@ def lex_analysis():
                 i += len(candidates[0][0])
 
 
+def add_tree(graph, label, parent_id):
+    global NODE_ID
+    if (label == 'Quantifier' or 'Connective' or 'Variable' or
+            'Constant' or 'Predicate'):
+        graph.add_node(pydot.Node(NODE_ID, label=label))
+        graph.add_edge(pydot.Edge(parent_id, NODE_ID))
+        NODE_ID += 1
+        graph.add_node(pydot.Node(
+            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
+        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
+        TERM_NODES.append(NODE_ID)
+        NODE_ID += 1
+    else:
+        graph.add_node(pydot.Node(NODE_ID, label=f'"{escape_bslash(label)}"'))
+        graph.add_edge(pydot.Edge(parent_id, NODE_ID))
+        NODE_ID += 1
+
+
 def match(terminal):
     global LOOKAHEAD_INDEX
     if LOOKAHEAD_INDEX == len(TOKENS):
