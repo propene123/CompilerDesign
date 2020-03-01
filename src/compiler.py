@@ -2,6 +2,7 @@ import sys
 import re
 import pydot
 
+LOG_FILE = ''
 CONNSTRINGS = ['AND', 'OR', 'IMPLIES', 'IFF', 'NOT']
 QSTRINGS = ['EXISTS', 'FORALL']
 LOOKAHEAD_INDEX = 0
@@ -18,14 +19,38 @@ NODE_ID = 0
 TERM_NODES = []
 
 
+def open_logger(path):
+    global LOG_FILE
+    try:
+        LOG_FILE = open(path, 'w')
+    except IOError:
+        sys.exit('Could not open log file. EXITING.')
+
+
+def close_logger():
+    global LOG_FILE
+    try:
+        LOG_FILE.close()
+    except IOError:
+        sys.exit('Could not close log file. EXITING.')
+
+
+def log_error(err_str):
+    print(err_str)
+    try:
+        LOG_FILE.write(err_str)
+    except IOError:
+        sys.exit('Could not write to log file. EXITING.')
+
+
 def escape_bslash(string):
     return string.replace('\\', '\\\\')
 
 
 def validate_var(var):
     if not re.fullmatch(r'[a-zA-Z0-9_]+', var):
-        sys.exit(f'Identifier {var} contains an invalid symbol. Identifiers' +
-                 f' can only contain alphanumeric characters or underscores')
+        log_error(f'Identifier {var} contains an invalid symbol. Identifiers' +
+                  f' can only contain alphanumeric characters or underscores')
 
 
 def parse_variables(line_split, sym_table):
@@ -34,7 +59,7 @@ def parse_variables(line_split, sym_table):
         for var in variables:
             validate_var(var)
             if var in sym_table:
-                sys.exit(
+                log_error(
                     f'Variable {var} is already defined as a' +
                     f' {sym_table[var][0]}')
             else:
@@ -47,7 +72,7 @@ def parse_constants(line_split, sym_table):
         for con in constants:
             validate_var(con)
             if con in sym_table:
-                sys.exit(
+                log_error(
                     f'Constant {con} is already defined as a' +
                     f' {sym_table[con][0]}')
             else:
@@ -56,12 +81,12 @@ def parse_constants(line_split, sym_table):
 
 def parse_equality(line_split, sym_table):
     if len(line_split) != 2 or len(line_split[1].split()) != 1:
-        sys.exit(
+        log_error(
             'Exactly 1 equality symbol must be sepecified in an' +
             f' input file')
     equality = line_split[1].split()[0]
     if equality in sym_table:
-        sys.exit(
+        log_error(
             f'Equality {equality} is already defined as a' +
             f' {sym_table[equality][0]}')
     else:
@@ -70,12 +95,12 @@ def parse_equality(line_split, sym_table):
 
 def parse_connectives(line_split, sym_table):
     if len(line_split) != 2 or len(line_split[1].split()) != 5:
-        sys.exit('Exactly 5 equality symbols must be defined')
+        log_error('Exactly 5 equality symbols must be defined')
     connectives = line_split[1].split()
     count = 0
     for con in connectives:
         if con in sym_table:
-            sys.exit(
+            log_error(
                 f'Connective {con} is already defined as a' +
                 f' {sym_table[con][0]}')
         else:
@@ -85,12 +110,12 @@ def parse_connectives(line_split, sym_table):
 
 def parse_quantifiers(line_split, sym_table):
     if len(line_split) != 2 or len(line_split[1].split()) != 2:
-        sys.exit('Exactly 2 quantifiers must be sepecified')
+        log_error('Exactly 2 quantifiers must be sepecified')
     quantifiers = line_split[1].split()
     count = 0
     for quant in quantifiers:
         if quant in sym_table:
-            sys.exit(
+            log_error(
                 f'Quantifier {quant} is already defined as a' +
                 f' {sym_table[quant][0]}')
         else:
@@ -103,13 +128,13 @@ def parse_predicates(line_split, sym_table):
         predicates = line_split[1].split()
         for pred in predicates:
             if not re.fullmatch(r'[a-zA-Z0-9_]+\[[0-9]+\]', pred):
-                sys.exit(
+                log_error(
                     f'Predicate {pred} does not match valid predicate' +
                     f' syntax. Correct syntax is symbol[count]')
             name = re.match(r'[a-zA-Z0-9_]+', pred).group(0)
             count = pred.split('[')[1][0:-1]
             if name in sym_table:
-                sys.exit(
+                log_error(
                     f'Predicate {name} is already defined as a' +
                     f' {sym_table[name][0]}')
             else:
@@ -120,10 +145,10 @@ def parse_formula(lines, count):
     global FORMULA
     split = lines[count].split(':')
     if len(split) != 2:
-        sys.exit('You must specify a formula in the input file')
+        log_error('You must specify a formula in the input file')
     FORMULA = ''.join(split[1].split())
     if len(FORMULA) == 0:
-        sys.exit('You must specify a formula in the input file')
+        log_error('You must specify a formula in the input file')
     for i in range(count + 1, len(lines)):
         if len(lines[i].split(':')) == 1:
             FORMULA += ''.join(lines[i].split())
@@ -136,7 +161,7 @@ def read_in_file(file_name, sym_table):
         with open(file_name) as in_file:
             lines = list(in_file)
     except IOError:
-        sys.exit('Could not open input file.')
+        log_error('Could not open input file.')
     count = 0
     for line in lines:
         line_split = line.split(':')
@@ -267,7 +292,7 @@ def lex_analysis():
             candidates.append([match_set([NEGATION], i), 'NEGATION'])
             candidates.sort(key=lambda item: len(item[0]), reverse=True)
             if len(candidates[0][0]) == 0:
-                sys.exit('Formula contains invalid identifiers')
+                log_error('Formula contains invalid identifiers')
             else:
                 TOKENS.append([candidates[0][1], candidates[0][0]])
                 i += len(candidates[0][0])
@@ -299,21 +324,21 @@ def add_tree(graph, label, parent_id):
 def match(terminal):
     global LOOKAHEAD_INDEX
     if LOOKAHEAD_INDEX == len(TOKENS):
-        sys.exit(f'Syntax Error. Expected {terminal} at pos' +
-                 f' {LOOKAHEAD_INDEX}. Instead found nothing.')
+        log_error(f'Syntax Error. Expected {terminal} at pos' +
+                  f' {LOOKAHEAD_INDEX}. Instead found nothing.')
     if terminal == TOKENS[LOOKAHEAD_INDEX][0]:
         LOOKAHEAD_INDEX += 1
     else:
-        sys.exit(f'Syntax Error. Expected {terminal} at pos ' +
-                 f'{LOOKAHEAD_INDEX} instead found' +
-                 f' {TOKENS[LOOKAHEAD_INDEX]}')
+        log_error(f'Syntax Error. Expected {terminal} at pos ' +
+                  f'{LOOKAHEAD_INDEX} instead found' +
+                  f' {TOKENS[LOOKAHEAD_INDEX]}')
 
 
 def predicate_rule(sym_table, graph, parent_id):
     global NODE_ID
     if LOOKAHEAD_INDEX == len(TOKENS):
-        sys.exit(f'Syntax Error. Expected Predicate at pos {LOOKAHEAD_INDEX}' +
-                 f'. Instead found nothing.')
+        log_error(f'Syntax Error. Expected Predicate at pos {LOOKAHEAD_INDEX}' +
+                  f'. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         count = int(sym_table[TOKENS[LOOKAHEAD_INDEX][1]][1])
         match('PREDICATE')
@@ -337,16 +362,16 @@ def predicate_rule(sym_table, graph, parent_id):
         add_tree(graph, ')', start_id)
         TERM_NODES.append(NODE_ID-1)
     else:
-        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                 f' in Predicate found at pos {LOOKAHEAD_INDEX}' +
-                 f' expected Predicate')
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                  f' in Predicate found at pos {LOOKAHEAD_INDEX}' +
+                  f' expected Predicate')
 
 
 def const_var(graph, parent_id):
     global NODE_ID
     if LOOKAHEAD_INDEX == len(TOKENS):
-        sys.exit(f'Syntax Error. Expected Variable or Constant at pos' +
-                 f' {LOOKAHEAD_INDEX}. Instead found nothing.')
+        log_error(f'Syntax Error. Expected Variable or Constant at pos' +
+                  f' {LOOKAHEAD_INDEX}. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'CONSTANT':
         match('CONSTANT')
         add_tree(graph, 'Constant', parent_id)
@@ -356,9 +381,9 @@ def const_var(graph, parent_id):
         add_tree(graph, 'Variable', parent_id)
         TERM_NODES.append(NODE_ID-1)
     else:
-        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                 f' in Atom at pos {LOOKAHEAD_INDEX} expected Variable or' +
-                 f' Constant')
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                  f' in Atom at pos {LOOKAHEAD_INDEX} expected Variable or' +
+                  f' Constant')
 
 
 def atom(sym_table, graph, parent_id):
@@ -366,8 +391,8 @@ def atom(sym_table, graph, parent_id):
     add_tree(graph, 'Atom', parent_id)
     start_id = NODE_ID - 1
     if LOOKAHEAD_INDEX == len(TOKENS):
-        sys.exit(f'Syntax Error. Expected Atom at pos {LOOKAHEAD_INDEX}.' +
-                 f' Instead found nothing.')
+        log_error(f'Syntax Error. Expected Atom at pos {LOOKAHEAD_INDEX}.' +
+                  f' Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
         match('(')
         add_tree(graph, '(', start_id)
@@ -383,8 +408,8 @@ def atom(sym_table, graph, parent_id):
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         predicate_rule(sym_table, graph, start_id)
     else:
-        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                 f' in Atom at pos {LOOKAHEAD_INDEX} expected ( or Predicate')
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                  f' in Atom at pos {LOOKAHEAD_INDEX} expected ( or Predicate')
 
 
 def formula(sym_table, graph, parent_id):
@@ -392,8 +417,8 @@ def formula(sym_table, graph, parent_id):
     add_tree(graph, 'Formula', parent_id)
     start_id = NODE_ID - 1
     if LOOKAHEAD_INDEX == len(TOKENS):
-        sys.exit(f'Syntax Error. Expected Formula at pos {LOOKAHEAD_INDEX}.' +
-                 f' Instead found nothing.')
+        log_error(f'Syntax Error. Expected Formula at pos {LOOKAHEAD_INDEX}.' +
+                  f' Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
         if (LOOKAHEAD_INDEX < len(TOKENS)-1 and
                 (TOKENS[LOOKAHEAD_INDEX+1][0] in ('VARIABLE', 'CONSTANT'))):
@@ -426,10 +451,10 @@ def formula(sym_table, graph, parent_id):
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         atom(sym_table, graph, start_id)
     else:
-        sys.exit(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                 f' in Formula at pos {LOOKAHEAD_INDEX} expected ( or' +
-                 f' Variable or Constant or Negation or Quantifier or' +
-                 f' PREDICATE')
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+                  f' in Formula at pos {LOOKAHEAD_INDEX} expected ( or' +
+                  f' Variable or Constant or Negation or Quantifier or' +
+                  f' PREDICATE')
     return True
 
 
@@ -439,13 +464,14 @@ SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [
     'SEPARATOR', 'CB'], ',': ['SEPARATOR', 'C']}
 SYM_TABLE.update({'[': ['FORBIDDEN'], ']': ['FORBIDDEN']})
 INFILE = sys.argv[1]
+open_logger('log.txt')
 read_in_file(INFILE, SYM_TABLE)
 generate_grammar_lists(SYM_TABLE)
 lex_analysis()
 pgraph = pydot.Dot(graph_type='graph', rankdir='TB')
 formula(SYM_TABLE, pgraph, -1)
 if LOOKAHEAD_INDEX != len(TOKENS):
-    sys.exit('Syntax error trailing symbols at end of formula')
+    log_error('Syntax error trailing symbols at end of formula')
 subgraph = pydot.Subgraph(rank='max')
 for node in TERM_NODES:
     subgraph.add_node(pydot.Node(node))
