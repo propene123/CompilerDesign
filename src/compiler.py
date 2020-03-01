@@ -23,7 +23,7 @@ def escape_bslash(string):
 
 
 def validate_var(var):
-    if not re.fullmatch(r'[a-zA-Z0-9_]', var):
+    if not re.fullmatch(r'[a-zA-Z0-9_]+', var):
         sys.exit(f'Identifier {var} contains an invalid symbol. Identifiers' +
                  f' can only contain alphanumeric characters or underscores')
 

@@ -29,7 +29,6 @@ const_var	src/compiler.py	/^def const_var(graph, parent_id):$/;"	f
 escape_bslash	src/compiler.py	/^def escape_bslash(string):$/;"	f
 formula	src/compiler.py	/^def formula(sym_table, graph, parent_id):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
-lel	src/hmm.py	/^lel = 'crackpot'$/;"	v
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 match	src/compiler.py	/^def match(terminal):$/;"	f
 match_set	src/compiler.py	/^def match_set(sym_set, index):$/;"	f
