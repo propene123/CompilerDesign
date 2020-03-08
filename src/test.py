@@ -222,7 +222,7 @@ def main():
         call_program(sys.argv[1], ex_pass=False)
 
         sub_dict = gen_sub(sub=False)
-        sub_dict['EQ'] = f"\\{sub_dict['EQ']}"
+        sub_dict['EQ'] = f"*{sub_dict['EQ']}"
         write_to_file(formula, sub_dict, ran_order=False)
         call_program(sys.argv[1], ex_pass=False)
     print("\n\n")

@@ -6,6 +6,7 @@ LOG_FILE = ''
 CONNSTRINGS = ['AND', 'OR', 'IMPLIES', 'IFF', 'NOT']
 QSTRINGS = ['EXISTS', 'FORALL']
 LOOKAHEAD_INDEX = 0
+FORM_INDEX = 0
 EQUALITY = ''
 NEGATION = ''
 CONNECTIVES = []
@@ -38,8 +39,16 @@ def close_logger():
 def log_error(err_str):
     print(err_str)
     try:
-        LOG_FILE.write(err_str)
-        exit()
+        LOG_FILE.write('[ERROR] ' + err_str)
+        sys.exit()
+    except IOError:
+        sys.exit('Could not write to log file. EXITING.')
+
+
+def log_msg(msg_str):
+    print(msg_str)
+    try:
+        LOG_FILE.write('[MSG] ' + msg_str)
     except IOError:
         sys.exit('Could not write to log file. EXITING.')
 
@@ -399,23 +408,24 @@ def add_tree(graph, label, parent_id):
 
 
 def match(terminal):
-    global LOOKAHEAD_INDEX
+    global LOOKAHEAD_INDEX, FORM_INDEX
     if LOOKAHEAD_INDEX == len(TOKENS):
-        log_error(f'Syntax Error. Expected {terminal} at pos' +
-                  f' {LOOKAHEAD_INDEX}. Instead found nothing.')
+        log_error(f'Syntax Error. Expected {terminal} at formula position' +
+                  f' {FORM_INDEX}. Instead found nothing.')
     if terminal == TOKENS[LOOKAHEAD_INDEX][0]:
         LOOKAHEAD_INDEX += 1
+        FORM_INDEX += len(SYM_TABLE[terminal])
     else:
-        log_error(f'Syntax Error. Expected {terminal} at pos ' +
-                  f'{LOOKAHEAD_INDEX} instead found' +
+        log_error(f'Syntax Error. Expected {terminal} at formula position ' +
+                  f'{FORM_INDEX} instead found' +
                   f' {TOKENS[LOOKAHEAD_INDEX]}')
 
 
 def predicate_rule(sym_table, graph, parent_id):
     global NODE_ID
     if LOOKAHEAD_INDEX == len(TOKENS):
-        log_error(f'Syntax Error. Expected Predicate at pos {LOOKAHEAD_INDEX}' +
-                  f'. Instead found nothing.')
+        log_error(f'Syntax Error. Expected Predicate at formula position ' +
+                  f'{FORM_INDEX}. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         count = int(sym_table[TOKENS[LOOKAHEAD_INDEX][1]][1])
         match('PREDICATE')
@@ -440,15 +450,15 @@ def predicate_rule(sym_table, graph, parent_id):
         TERM_NODES.append(NODE_ID-1)
     else:
         log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                  f' in Predicate found at pos {LOOKAHEAD_INDEX}' +
+                  f' in Predicate found at formula position {FORM_INDEX}' +
                   f' expected Predicate')
 
 
 def const_var(graph, parent_id):
     global NODE_ID
     if LOOKAHEAD_INDEX == len(TOKENS):
-        log_error(f'Syntax Error. Expected Variable or Constant at pos' +
-                  f' {LOOKAHEAD_INDEX}. Instead found nothing.')
+        log_error(f'Syntax Error. Expected Variable or Constant at ' +
+                  f'formula position {FORM_INDEX}. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == 'CONSTANT':
         match('CONSTANT')
         add_tree(graph, 'Constant', parent_id)
@@ -459,8 +469,8 @@ def const_var(graph, parent_id):
         TERM_NODES.append(NODE_ID-1)
     else:
         log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                  f' in Atom at pos {LOOKAHEAD_INDEX} expected Variable or' +
-                  f' Constant')
+                  f' in Atom at formula position {FORM_INDEX} expected ' +
+                  f'Variable or Constant')
 
 
 def atom(sym_table, graph, parent_id):
@@ -468,7 +478,7 @@ def atom(sym_table, graph, parent_id):
     add_tree(graph, 'Atom', parent_id)
     start_id = NODE_ID - 1
     if LOOKAHEAD_INDEX == len(TOKENS):
-        log_error(f'Syntax Error. Expected Atom at pos {LOOKAHEAD_INDEX}.' +
+        log_error(f'Syntax Error. Expected Atom at formula position {FORM_INDEX}.' +
                   f' Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
         match('(')
@@ -486,7 +496,8 @@ def atom(sym_table, graph, parent_id):
         predicate_rule(sym_table, graph, start_id)
     else:
         log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                  f' in Atom at pos {LOOKAHEAD_INDEX} expected ( or Predicate')
+                  f' in Atom at formula position {FORM_INDEX} expected ' +
+                  f'( or Predicate')
 
 
 def formula(sym_table, graph, parent_id):
@@ -494,8 +505,8 @@ def formula(sym_table, graph, parent_id):
     add_tree(graph, 'Formula', parent_id)
     start_id = NODE_ID - 1
     if LOOKAHEAD_INDEX == len(TOKENS):
-        log_error(f'Syntax Error. Expected Formula at pos {LOOKAHEAD_INDEX}.' +
-                  f' Instead found nothing.')
+        log_error(f'Syntax Error. Expected Formula at formula position ' +
+                  f'{FORM_INDEX}. Instead found nothing.')
     if TOKENS[LOOKAHEAD_INDEX][0] == '(':
         if (LOOKAHEAD_INDEX < len(TOKENS)-1 and
                 (TOKENS[LOOKAHEAD_INDEX+1][0] in ('VARIABLE', 'CONSTANT'))):
@@ -529,8 +540,8 @@ def formula(sym_table, graph, parent_id):
         atom(sym_table, graph, start_id)
     else:
         log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
-                  f' in Formula at pos {LOOKAHEAD_INDEX} expected ( or' +
-                  f' Variable or Constant or Negation or Quantifier or' +
+                  f' in Formula at formula position {FORM_INDEX} expected ' +
+                  f'( or Variable or Constant or Negation or Quantifier or' +
                   f' PREDICATE')
     return True
 

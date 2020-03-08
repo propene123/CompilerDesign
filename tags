@@ -19,6 +19,7 @@ CONSTANTS	src/compiler.py	/^CONSTANTS = []$/;"	v
 CompilerDesign	README.md	/^# CompilerDesign/;"	c
 EQUALITY	src/compiler.py	/^EQUALITY = ''$/;"	v
 FORMULA	src/compiler.py	/^FORMULA = ''$/;"	v
+FORM_INDEX	src/compiler.py	/^FORM_INDEX = 0$/;"	v
 INFILE	src/compiler.py	/^INFILE = sys.argv[1]$/;"	v
 LOG_FILE	src/compiler.py	/^LOG_FILE = ''$/;"	v
 LOOKAHEAD_INDEX	src/compiler.py	/^LOOKAHEAD_INDEX = 0$/;"	v
@@ -44,6 +45,7 @@ hmmm	src/lol.py	/^hmmm = kek.split(':')$/;"	v
 kek	src/lol.py	/^kek = "jghaghahegkaghg:"$/;"	v
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 log_error	src/compiler.py	/^def log_error(err_str):$/;"	f
+log_msg	src/compiler.py	/^def log_msg(msg_str):$/;"	f
 lol	src/lol.py	/^lol = hmmm[1].split()$/;"	v
 main	src/test.py	/^def main():$/;"	f
 match	src/compiler.py	/^def match(terminal):$/;"	f
