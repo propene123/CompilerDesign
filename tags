@@ -6,6 +6,13 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/381d6ba/
+BASE_CONN	src/test.py	/^BASE_CONN = ["AND", "OR", "IMPLIES", "IFF", "NEG"]$/;"	v
+BASE_CONST	src/test.py	/^BASE_CONST = ["CONST1", "CONST2", "CONST3", "CONST4", "CONST5"]$/;"	v
+BASE_EQ	src/test.py	/^BASE_EQ = ["EQ"]$/;"	v
+BASE_FORMULA	src/test.py	/^BASE_FORMULA = [$/;"	v
+BASE_PRED	src/test.py	/^BASE_PRED = ["PRED1", "PRED2", "PRED3", "PRED4"]$/;"	v
+BASE_QUAN	src/test.py	/^BASE_QUAN = ["EXISTS", "FORALL"]$/;"	v
+BASE_VAR	src/test.py	/^BASE_VAR = ["VAR1", "VAR2", "VAR3", "VAR4", "VAR5"]$/;"	v
 CONNECTIVES	src/compiler.py	/^CONNECTIVES = []$/;"	v
 CONNSTRINGS	src/compiler.py	/^CONNSTRINGS = ['AND', 'OR', 'IMPLIES', 'IFF', 'NOT']$/;"	v
 CONSTANTS	src/compiler.py	/^CONSTANTS = []$/;"	v
@@ -26,13 +33,19 @@ TOKENS	src/compiler.py	/^TOKENS = []$/;"	v
 VARIABLES	src/compiler.py	/^VARIABLES = []$/;"	v
 add_tree	src/compiler.py	/^def add_tree(graph, label, parent_id):$/;"	f
 atom	src/compiler.py	/^def atom(sym_table, graph, parent_id):$/;"	f
+call_program	src/test.py	/^def call_program(py_path, ex_pass=True):$/;"	f
 close_logger	src/compiler.py	/^def close_logger():$/;"	f
 const_var	src/compiler.py	/^def const_var(graph, parent_id):$/;"	f
 escape_bslash	src/compiler.py	/^def escape_bslash(string):$/;"	f
 formula	src/compiler.py	/^def formula(sym_table, graph, parent_id):$/;"	f
+gen_sub	src/test.py	/^def gen_sub(sub=True):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
+hmmm	src/lol.py	/^hmmm = kek.split(':')$/;"	v
+kek	src/lol.py	/^kek = "jghaghahegkaghg:"$/;"	v
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 log_error	src/compiler.py	/^def log_error(err_str):$/;"	f
+lol	src/lol.py	/^lol = hmmm[1].split()$/;"	v
+main	src/test.py	/^def main():$/;"	f
 match	src/compiler.py	/^def match(terminal):$/;"	f
 match_set	src/compiler.py	/^def match_set(sym_set, index):$/;"	f
 open_logger	src/compiler.py	/^def open_logger(path):$/;"	f
@@ -53,4 +66,7 @@ print_quantifiers	src/compiler.py	/^def print_quantifiers():$/;"	f
 print_variables	src/compiler.py	/^def print_variables():$/;"	f
 read_in_file	src/compiler.py	/^def read_in_file(file_name, sym_table):$/;"	f
 subgraph	src/compiler.py	/^subgraph = pydot.Subgraph(rank='max')$/;"	v
-validate_var	src/compiler.py	/^def validate_var(var):$/;"	f
+validate_equality	src/compiler.py	/^def validate_equality(var):$/;"	f
+validate_quant_conn	src/compiler.py	/^def validate_quant_conn(var, var_type):$/;"	f
+validate_var	src/compiler.py	/^def validate_var(var, var_type):$/;"	f
+write_to_file	src/test.py	/^def write_to_file(formula, sub_dict, ran_order=False, fields=None):$/;"	f

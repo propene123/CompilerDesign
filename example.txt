@@ -4,4 +4,5 @@ predicates: P[2] Q[1]
 equality: =
 connectives: \land \lor \implies \iff NOT
 quantifiers: \forall \exists
-formula: ( ( \forallx\existsy(x = y)  \implies  NOT\existsx (x = D)  ) \land \forallx\forally(y = x) )
+formula: ( ( \forallx\existsy(x = y) 
+\implies  NOT\existsx (x = D)  ) \land \forallx\forally(y = x) )

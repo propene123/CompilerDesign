@@ -39,6 +39,7 @@ def log_error(err_str):
     print(err_str)
     try:
         LOG_FILE.write(err_str)
+        exit()
     except IOError:
         sys.exit('Could not write to log file. EXITING.')
 
@@ -47,17 +48,31 @@ def escape_bslash(string):
     return string.replace('\\', '\\\\')
 
 
-def validate_var(var):
+def validate_var(var, var_type):
     if not re.fullmatch(r'[a-zA-Z0-9_]+', var):
-        log_error(f'Identifier {var} contains an invalid symbol. Identifiers' +
+        log_error(f'{var_type} {var} contains an invalid symbol. {var_type}s' +
                   f' can only contain alphanumeric characters or underscores')
+
+
+def validate_quant_conn(var, var_type):
+    if not re.fullmatch(r'[a-zA-Z0-9_\\]+', var):
+        log_error(f'{var_type} {var} contains an invalid symbol. {var_type}s' +
+                  f' can only contain alphanumeric characters, underscores' +
+                  f' or backslashes')
+
+
+def validate_equality(var):
+    if not re.fullmatch(r'[a-zA-Z0-9_=]+', var):
+        log_error(f'Equality {var} contains an invalid symbol. Equality' +
+                  f' can only contain alphanumeric characters, underscores' +
+                  f' or "="')
 
 
 def parse_variables(line_split, sym_table):
     if len(line_split) == 2:
         variables = line_split[1].split()
         for var in variables:
-            validate_var(var)
+            validate_var(var, 'Variable')
             if var in sym_table:
                 log_error(
                     f'Variable {var} is already defined as a' +
@@ -70,7 +85,7 @@ def parse_constants(line_split, sym_table):
     if len(line_split) == 2:
         constants = line_split[1].split()
         for con in constants:
-            validate_var(con)
+            validate_var(con, 'Constant')
             if con in sym_table:
                 log_error(
                     f'Constant {con} is already defined as a' +
@@ -85,6 +100,7 @@ def parse_equality(line_split, sym_table):
             'Exactly 1 equality symbol must be sepecified in an' +
             f' input file')
     equality = line_split[1].split()[0]
+    validate_equality(equality)
     if equality in sym_table:
         log_error(
             f'Equality {equality} is already defined as a' +
@@ -99,6 +115,7 @@ def parse_connectives(line_split, sym_table):
     connectives = line_split[1].split()
     count = 0
     for con in connectives:
+        validate_quant_conn(con, 'Connective')
         if con in sym_table:
             log_error(
                 f'Connective {con} is already defined as a' +
@@ -114,6 +131,7 @@ def parse_quantifiers(line_split, sym_table):
     quantifiers = line_split[1].split()
     count = 0
     for quant in quantifiers:
+        validate_quant_conn(quant, 'Quantifier')
         if quant in sym_table:
             log_error(
                 f'Quantifier {quant} is already defined as a' +
@@ -143,6 +161,7 @@ def parse_predicates(line_split, sym_table):
 
 def parse_formula(lines, count):
     global FORMULA
+    skip = 0
     split = lines[count].split(':')
     if len(split) != 2:
         log_error('You must specify a formula in the input file')
@@ -152,8 +171,10 @@ def parse_formula(lines, count):
     for i in range(count + 1, len(lines)):
         if len(lines[i].split(':')) == 1:
             FORMULA += ''.join(lines[i].split())
+            skip += 1
         else:
             break
+    return skip
 
 
 def read_in_file(file_name, sym_table):
@@ -162,8 +183,9 @@ def read_in_file(file_name, sym_table):
             lines = list(in_file)
     except IOError:
         log_error('Could not open input file.')
-    count = 0
-    for line in lines:
+    i = 0
+    while i < len(lines):
+        line = lines[i]
         line_split = line.split(':')
         if line_split[0].strip() == 'variables':
             parse_variables(line_split, sym_table)
@@ -178,12 +200,18 @@ def read_in_file(file_name, sym_table):
         elif line_split[0].strip() == 'predicates':
             parse_predicates(line_split, sym_table)
         elif line_split[0].strip() == 'formula':
-            parse_formula(lines, count)
-        count += 1
+            skip = parse_formula(lines, i)
+            i += skip
+        else:
+            sys.exit(f'Invalid field name {line_split[0].strip()} on line {i}')
+        i += 1
 
 
 def print_constants():
     print('Constant -> ', end='')
+    if not CONSTANTS:
+        print()
+        return
     for i in range(len(CONSTANTS)-1):
         print(CONSTANTS[i], end='|')
     print(CONSTANTS[-1])
@@ -191,12 +219,18 @@ def print_constants():
 
 def print_variables():
     print('Variable -> ', end='')
+    if not VARIABLES:
+        print()
+        return
     for i in range(len(VARIABLES)-1):
         print(VARIABLES[i], end='|')
     print(VARIABLES[-1])
 
 
 def print_predicates(sym_table):
+    if not PREDICATES:
+        print()
+        return
     for pred in PREDICATES:
         print(f'{pred}_rule -> {pred}(', end='')
         for _ in range(int(sym_table[pred][1])-1):
@@ -468,6 +502,7 @@ open_logger('log.txt')
 read_in_file(INFILE, SYM_TABLE)
 generate_grammar_lists(SYM_TABLE)
 lex_analysis()
+print(FORMULA)
 pgraph = pydot.Dot(graph_type='graph', rankdir='TB')
 formula(SYM_TABLE, pgraph, -1)
 if LOOKAHEAD_INDEX != len(TOKENS):

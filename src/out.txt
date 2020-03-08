@@ -1,0 +1,20 @@
+Grammar rules for the first order logic language.
+Constant -> CONST1|CONST2|CONST3|CONST4|CONST5
+Variable -> VAR1|VAR2|VAR3|VAR4|VAR5
+PRED1_rule -> PRED1(Variable)
+PRED2_rule -> PRED2(Variable,Variable)
+PRED3_rule -> PRED3(Variable,Variable,Variable)
+PRED4_rule -> PRED4(Variable,Variable,Variable,Variable)
+Predicate_rule -> PRED1_rule|PRED2_rule|PRED3_rule|PRED4_rule
+Equality -> EQ
+Quantifier -> EXISTS|FORALL
+Connective -> AND|OR|IMPLIES|IFF
+Negation -> NEG
+Atom -> Predicate_rule|(ConstantEqualityConstant)|(ConstantEqualityVariable)|(VariableEqualityConstant)|(VariableEqualityVariable)
+Formula -> Atom|(FormulaConnectiveFormula)|NegationFormula|QuantifierFormula
+((VAR1EQVAR2)ANDNEGFORALLVAR3PRED2(VAR1,VAR2))
+-- STAGE 1: Basic Input --
+This program should PASS
+
+
+This program should PASS
