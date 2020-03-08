@@ -62,7 +62,7 @@ def validate_quant_conn(var, var_type):
 
 
 def validate_equality(var):
-    if not re.fullmatch(r'[a-zA-Z0-9_=]+', var):
+    if not re.fullmatch(r'[a-zA-Z0-9_=\\]+', var):
         log_error(f'Equality {var} contains an invalid symbol. Equality' +
                   f' can only contain alphanumeric characters, underscores' +
                   f' or "="')
@@ -184,26 +184,69 @@ def read_in_file(file_name, sym_table):
     except IOError:
         log_error('Could not open input file.')
     i = 0
+    var = (False, 0)
+    con = (False, 0)
+    eq = (False, 0)
+    conn = (False, 0)
+    quant = (False, 0)
+    pred = (False, 0)
+    form = (False, 0)
     while i < len(lines):
         line = lines[i]
         line_split = line.split(':')
         if line_split[0].strip() == 'variables':
+            if var[0]:
+                log_error(f'Variables have already been defined' +
+                          f' on line {var[1]} of input file' +
+                          f' cannot redefine them on line {i}')
             parse_variables(line_split, sym_table)
+            var = (True, i)
         elif line_split[0].strip() == 'constants':
+            if con[0]:
+                log_error(f'Constants have already been defined' +
+                          f' on line {var[1]} of input file' +
+                          f' cannot redefine them on line {i}')
             parse_constants(line_split, sym_table)
+            con = (True, i)
         elif line_split[0].strip() == 'equality':
+            if eq[0]:
+                log_error(f'Equality has already been defined' +
+                          f' on line {var[1]} of input file' +
+                          f' cannot redefine them on line {i}')
             parse_equality(line_split, sym_table)
+            eq = (True, i)
         elif line_split[0].strip() == 'connectives':
+            if conn[0]:
+                log_error(f'Connectives have already been defined' +
+                          f' on line {var[1]} of input file' +
+                          f' cannot redefine them on line {i}')
             parse_connectives(line_split, sym_table)
+            conn = (True, i)
         elif line_split[0].strip() == 'quantifiers':
+            if quant[0]:
+                log_error(f'Quantifiers have already been defined' +
+                          f' on line {var[1]} of input file' +
+                          f' cannot redefine them on line {i}')
             parse_quantifiers(line_split, sym_table)
+            quant = (True, i)
         elif line_split[0].strip() == 'predicates':
+            if pred[0]:
+                log_error(f'Predicates have already been defined' +
+                          f' on line {var[1]} of input file' +
+                          f' cannot redefine them on line {i}')
             parse_predicates(line_split, sym_table)
+            pred = (True, i)
         elif line_split[0].strip() == 'formula':
+            if form[0]:
+                log_error(f'Formula has already been defined' +
+                          f' on line {var[1]} of input file' +
+                          f' cannot redefine them on line {i}')
             skip = parse_formula(lines, i)
+            form = (True, i)
             i += skip
         else:
-            sys.exit(f'Invalid field name {line_split[0].strip()} on line {i}')
+            log_error(f'Invalid field name {line_split[0].strip()} on' +
+                      f' line {i}')
         i += 1
 
 

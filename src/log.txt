@@ -1,0 +1,1 @@
+Variables have already been defined on line 0 of input file cannot redefine them on line 6
