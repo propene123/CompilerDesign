@@ -1,3 +1,4 @@
+import time
 import sys
 import re
 import pydot
@@ -548,11 +549,18 @@ def formula(sym_table, graph, parent_id):
 
 if len(sys.argv) < 2:
     sys.exit('no input file specified')
+LOG_FILE_NAME = 'log'
+if len(sys.argv) > 2:
+    LOG_FILE_NAME = sys.argv[2]
+PARSE_TREE_NAME = 'parse_tree'
+if len(sys.argv) > 3:
+    PARSE_TREE_NAME = sys.argv[3]
 SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [
     'SEPARATOR', 'CB'], ',': ['SEPARATOR', 'C']}
 SYM_TABLE.update({'[': ['FORBIDDEN'], ']': ['FORBIDDEN']})
 INFILE = sys.argv[1]
-open_logger('log.txt')
+TIME_STR = time.strftime('%Y-%m-%d_%H-%M-%S')
+open_logger(TIME_STR+'_'+LOG_FILE_NAME+'.txt')
 read_in_file(INFILE, SYM_TABLE)
 generate_grammar_lists(SYM_TABLE)
 lex_analysis()
@@ -565,4 +573,4 @@ subgraph = pydot.Subgraph(rank='max')
 for node in TERM_NODES:
     subgraph.add_node(pydot.Node(node))
 pgraph.add_subgraph(subgraph)
-pgraph.write_png('parse_tree.png')
+pgraph.write_png(TIME_STR+'_'+PARSE_TREE_NAME+'.png')
