@@ -454,7 +454,7 @@ def match(terminal):
     else:
         log_error(f'Syntax Error. Expected {terminal} at formula position ' +
                   f'{FORM_INDEX} instead found' +
-                  f' {TOKENS[LOOKAHEAD_INDEX]}')
+                  f' {TOKENS[LOOKAHEAD_INDEX][1]}')
 
 
 def predicate_rule(sym_table, graph, parent_id):
@@ -485,7 +485,7 @@ def predicate_rule(sym_table, graph, parent_id):
         add_tree(graph, ')', start_id)
         TERM_NODES.append(NODE_ID-1)
     else:
-        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX][1]}' +
                   f' in Predicate found at formula position {FORM_INDEX}' +
                   f' expected Predicate')
 
@@ -504,7 +504,7 @@ def const_var(graph, parent_id):
         add_tree(graph, 'Variable', parent_id)
         TERM_NODES.append(NODE_ID-1)
     else:
-        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX][1]}' +
                   f' in Atom at formula position {FORM_INDEX} expected ' +
                   f'Variable or Constant')
 
@@ -531,7 +531,7 @@ def atom(sym_table, graph, parent_id):
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         predicate_rule(sym_table, graph, start_id)
     else:
-        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX][1]}' +
                   f' in Atom at formula position {FORM_INDEX} expected ' +
                   f'( or Predicate')
 
@@ -575,7 +575,7 @@ def formula(sym_table, graph, parent_id):
     elif TOKENS[LOOKAHEAD_INDEX][0] == 'PREDICATE':
         atom(sym_table, graph, start_id)
     else:
-        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
+        log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX][1]}' +
                   f' in Formula at formula position {FORM_INDEX} expected ' +
                   f'( or Negation or Quantifier or PREDICATE')
     return True
