@@ -209,6 +209,7 @@ def read_in_file(file_name, sym_table):
                 log_error(f'Variables have already been defined' +
                           f' on line {var[1]} of input file' +
                           f' cannot redefine them on line {i}')
+            log_msg(f'Reading Variables')
             parse_variables(line_split, sym_table)
             var = (True, i)
         elif line_split[0].strip() == 'constants':
@@ -216,6 +217,7 @@ def read_in_file(file_name, sym_table):
                 log_error(f'Constants have already been defined' +
                           f' on line {var[1]} of input file' +
                           f' cannot redefine them on line {i}')
+            log_msg(f'Reading Constants')
             parse_constants(line_split, sym_table)
             con = (True, i)
         elif line_split[0].strip() == 'equality':
@@ -223,6 +225,7 @@ def read_in_file(file_name, sym_table):
                 log_error(f'Equality has already been defined' +
                           f' on line {var[1]} of input file' +
                           f' cannot redefine them on line {i}')
+            log_msg(f'Reading Equality')
             parse_equality(line_split, sym_table)
             eq = (True, i)
         elif line_split[0].strip() == 'connectives':
@@ -230,6 +233,7 @@ def read_in_file(file_name, sym_table):
                 log_error(f'Connectives have already been defined' +
                           f' on line {var[1]} of input file' +
                           f' cannot redefine them on line {i}')
+            log_msg(f'Reading Connectives')
             parse_connectives(line_split, sym_table)
             conn = (True, i)
         elif line_split[0].strip() == 'quantifiers':
@@ -237,6 +241,7 @@ def read_in_file(file_name, sym_table):
                 log_error(f'Quantifiers have already been defined' +
                           f' on line {var[1]} of input file' +
                           f' cannot redefine them on line {i}')
+            log_msg('Reading Quantifiers')
             parse_quantifiers(line_split, sym_table)
             quant = (True, i)
         elif line_split[0].strip() == 'predicates':
@@ -244,6 +249,7 @@ def read_in_file(file_name, sym_table):
                 log_error(f'Predicates have already been defined' +
                           f' on line {var[1]} of input file' +
                           f' cannot redefine them on line {i}')
+            log_msg('Reading Predicates')
             parse_predicates(line_split, sym_table)
             pred = (True, i)
         elif line_split[0].strip() == 'formula':
@@ -251,6 +257,7 @@ def read_in_file(file_name, sym_table):
                 log_error(f'Formula has already been defined' +
                           f' on line {var[1]} of input file' +
                           f' cannot redefine them on line {i}')
+            log_msg('Reading Formula')
             skip = parse_formula(lines, i)
             form = (True, i)
             i += skip
@@ -562,16 +569,26 @@ INFILE = sys.argv[1]
 TIME_STR = time.strftime('%Y-%m-%d_%H-%M-%S')
 open_logger(f'{TIME_STR}_{LOG_FILE_NAME}.txt')
 log_msg(f'Created logfile called {TIME_STR}_{LOG_FILE_NAME}.txt')
+log_msg(f'Starting read in file')
 read_in_file(INFILE, SYM_TABLE)
+log_msg(f'Finished Reading in file. Input file was valid')
+log_msg(f'Whitespace stripped formula used for error messages: {FORMULA}')
+log_msg(f'Starting grammar generation')
 generate_grammar_lists(SYM_TABLE)
+log_msg(f'Finished grammar generation')
+log_msg(f'Starting Lexical Analysis')
 lex_analysis()
-print(FORMULA)
+log_msg(f'Finished Lexical Analysis')
 pgraph = pydot.Dot(graph_type='graph', rankdir='TB')
+log_msg(f'Starting parsing')
 formula(SYM_TABLE, pgraph, -1)
+log_msg(f'Finished parsing')
 if LOOKAHEAD_INDEX != len(TOKENS):
     log_error('Syntax error trailing symbols at end of formula')
+log_msg(f'Formula is valid')
 subgraph = pydot.Subgraph(rank='max')
 for node in TERM_NODES:
     subgraph.add_node(pydot.Node(node))
 pgraph.add_subgraph(subgraph)
+log_msg(f'Saving parse tree to file: {TIME_STR}_{PARSE_TREE_NAME}.png')
 pgraph.write_png(f'{TIME_STR}_{PARSE_TREE_NAME}.png')
