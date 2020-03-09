@@ -40,7 +40,7 @@ def close_logger():
 def log_error(err_str):
     print(err_str)
     try:
-        LOG_FILE.write('[ERROR] ' + err_str)
+        LOG_FILE.write(f'[ERROR] {err_str}\n')
         sys.exit()
     except IOError:
         sys.exit('Could not write to log file. EXITING.')
@@ -49,7 +49,7 @@ def log_error(err_str):
 def log_msg(msg_str):
     print(msg_str)
     try:
-        LOG_FILE.write('[MSG] ' + msg_str)
+        LOG_FILE.write(f'[MSG] {msg_str}\n')
     except IOError:
         sys.exit('Could not write to log file. EXITING.')
 
@@ -360,13 +360,13 @@ def lex_analysis():
     i = 0
     while i < len(FORMULA):
         if FORMULA[i] == '(':
-            TOKENS.append(['('])
+            TOKENS.append(['(', '('])
             i += 1
         elif FORMULA[i] == ')':
-            TOKENS.append([')'])
+            TOKENS.append([')', ')'])
             i += 1
         elif FORMULA[i] == ',':
-            TOKENS.append([','])
+            TOKENS.append([',', ','])
             i += 1
         else:
             candidates = []
@@ -414,8 +414,8 @@ def match(terminal):
         log_error(f'Syntax Error. Expected {terminal} at formula position' +
                   f' {FORM_INDEX}. Instead found nothing.')
     if terminal == TOKENS[LOOKAHEAD_INDEX][0]:
+        FORM_INDEX += len(SYM_TABLE[TOKENS[LOOKAHEAD_INDEX][1]])
         LOOKAHEAD_INDEX += 1
-        FORM_INDEX += len(SYM_TABLE[terminal])
     else:
         log_error(f'Syntax Error. Expected {terminal} at formula position ' +
                   f'{FORM_INDEX} instead found' +
@@ -560,7 +560,8 @@ SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [
 SYM_TABLE.update({'[': ['FORBIDDEN'], ']': ['FORBIDDEN']})
 INFILE = sys.argv[1]
 TIME_STR = time.strftime('%Y-%m-%d_%H-%M-%S')
-open_logger(TIME_STR+'_'+LOG_FILE_NAME+'.txt')
+open_logger(f'{TIME_STR}_{LOG_FILE_NAME}.txt')
+log_msg(f'Created logfile called {TIME_STR}_{LOG_FILE_NAME}.txt')
 read_in_file(INFILE, SYM_TABLE)
 generate_grammar_lists(SYM_TABLE)
 lex_analysis()
@@ -573,4 +574,4 @@ subgraph = pydot.Subgraph(rank='max')
 for node in TERM_NODES:
     subgraph.add_node(pydot.Node(node))
 pgraph.add_subgraph(subgraph)
-pgraph.write_png(TIME_STR+'_'+PARSE_TREE_NAME+'.png')
+pgraph.write_png(f'{TIME_STR}_{PARSE_TREE_NAME}.png')
