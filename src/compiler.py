@@ -611,7 +611,10 @@ log_msg(f'Starting parsing')
 formula(SYM_TABLE, pgraph, -1)
 log_msg(f'Finished parsing')
 if LOOKAHEAD_INDEX != len(TOKENS):
-    log_error('Syntax error trailing symbols at end of formula')
+    log_error(f'Syntax error. Formula is valid until position {FORM_INDEX}.' +
+              f' Trailing symbols occur after this. Consider adding brackets' +
+              f' around formula position 0 to {FORM_INDEX} and re running' +
+              f' compiler.')
 log_msg(f'Formula is valid')
 subgraph = pydot.Subgraph(rank='max')
 for node in TERM_NODES:
