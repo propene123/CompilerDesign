@@ -267,8 +267,13 @@ def read_in_file(file_name, sym_table):
         i += 1
 
 
+def print_terminals():
+
+
+
+
 def print_constants():
-    print('Constant -> ', end='')
+    print('\'Constant\' -> ', end='')
     if not CONSTANTS:
         print()
         return
@@ -278,7 +283,7 @@ def print_constants():
 
 
 def print_variables():
-    print('Variable -> ', end='')
+    print('\'Variable\' -> ', end='')
     if not VARIABLES:
         print()
         return
@@ -292,36 +297,37 @@ def print_predicates(sym_table):
         print()
         return
     for pred in PREDICATES:
-        print(f'{pred}_rule -> {pred}(', end='')
+        print(f'\'{pred}_rule\' -> {pred}(', end='')
         for _ in range(int(sym_table[pred][1])-1):
-            print('Variable', end=',')
-        print('Variable)')
-    print('Predicate_rule -> ', end='')
+            print('\'Variable\'', end=',')
+        print('\'Variable\')')
+    print('\'Predicate_rule\' -> ', end='')
     for i in range(len(PREDICATES)-1):
-        print(f'{PREDICATES[i]}_rule', end='|')
-    print(f'{PREDICATES[-1]}_rule')
+        print(f'\'{PREDICATES[i]}_rule\'', end='|')
+    print(f'\'{PREDICATES[-1]}_rule\'')
 
 
 def print_quantifiers():
-    print('Quantifier -> ', end='')
+    print('\'Quantifier\' -> ', end='')
     for i in range(len(QUANTIFIERS)-1):
         print(QUANTIFIERS[i], end='|')
     print(QUANTIFIERS[-1])
 
 
 def print_connectives():
-    print('Connective -> ', end='')
+    print('\'Connective\' -> ', end='')
     for i in range(len(CONNECTIVES)-1):
         print(CONNECTIVES[i], end='|')
     print(CONNECTIVES[-1])
 
 
 def print_formulae():
-    print('Atom -> Predicate_rule|(ConstantEqualityConstant)|' +
-          '(ConstantEqualityVariable)|' +
-          '(VariableEqualityConstant)|(VariableEqualityVariable)')
-    print('Formula -> Atom|(FormulaConnectiveFormula)|' +
-          'NegationFormula|QuantifierFormula')
+    print('\'Atom\' -> \'Predicate_rule\'|(\'Constant\'\'Equality\'' +
+          '\'Constant\')|(\'Constant\'\'Equality\'\'Variable\')|(' +
+          '\'Variable\'\'Equality\'\'Constant\')|(\'Variable\'' +
+          '\'Equality\'\'Variable\')')
+    print('\'Formula\' -> \'Atom\'|(\'Formula\'\'Connective\'\'Formula\')|' +
+          '\'Negation\'\'Formula\'|\'Quantifier\'\'Formula\'')
 
 
 def generate_grammar_lists(sym_table):
@@ -342,7 +348,10 @@ def generate_grammar_lists(sym_table):
                 NEGATION = sym
             else:
                 CONNECTIVES.append(sym)
-    print('Grammar rules for the first order logic language.')
+    print('Grammar for first order logic formula')
+    print_terminals()
+    print_non_terminals()
+    print('Production rules for the first order logic language.')
     print_constants()
     print_variables()
     print_predicates(sym_table)
