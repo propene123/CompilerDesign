@@ -424,7 +424,7 @@ def add_tree(graph, label, parent_id):
     global NODE_ID
     if (label in ('Quantifier', 'Connective', 'Variable',
                   'Constant', 'Predicate', 'Negation', 'Equality')):
-        graph.add_node(pydot.Node(NODE_ID, label=label))
+        graph.add_node(pydot.Node(NODE_ID, label=f'"\'{label}\'"'))
         graph.add_edge(pydot.Edge(parent_id, NODE_ID))
         NODE_ID += 1
         graph.add_node(pydot.Node(
@@ -433,7 +433,7 @@ def add_tree(graph, label, parent_id):
         TERM_NODES.append(NODE_ID)
         NODE_ID += 1
     elif label == 'Formula':
-        graph.add_node(pydot.Node(NODE_ID, label=label))
+        graph.add_node(pydot.Node(NODE_ID, label=f'"\'{label}\'"'))
         if parent_id > -1:
             graph.add_edge(pydot.Edge(parent_id, NODE_ID))
         NODE_ID += 1
@@ -449,7 +449,7 @@ def match(terminal):
         log_error(f'Syntax Error. Expected {terminal} at formula position' +
                   f' {FORM_INDEX}. Instead found nothing.')
     if terminal == TOKENS[LOOKAHEAD_INDEX][0]:
-        FORM_INDEX += len(SYM_TABLE[TOKENS[LOOKAHEAD_INDEX][1]])
+        FORM_INDEX += len(TOKENS[LOOKAHEAD_INDEX][1])
         LOOKAHEAD_INDEX += 1
     else:
         log_error(f'Syntax Error. Expected {terminal} at formula position ' +
@@ -577,8 +577,7 @@ def formula(sym_table, graph, parent_id):
     else:
         log_error(f'Syntax Error. Illegal symbol {TOKENS[LOOKAHEAD_INDEX]}' +
                   f' in Formula at formula position {FORM_INDEX} expected ' +
-                  f'( or Variable or Constant or Negation or Quantifier or' +
-                  f' PREDICATE')
+                  f'( or Negation or Quantifier or PREDICATE')
     return True
 
 
