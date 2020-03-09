@@ -17,6 +17,7 @@
 """
 
 import sys
+import time
 import subprocess
 import random
 from collections import defaultdict
@@ -96,6 +97,7 @@ def write_to_file(formula, sub_dict, ran_order=False, fields=None):
 
 def call_program(py_path, ex_pass=True):
     print(f"This program should {'PASS' if ex_pass else 'FAIL'}")
+    sys.stdout.flush()
     subprocess.run(["python3", py_path, "test.txt"])
     print("\n")
 
