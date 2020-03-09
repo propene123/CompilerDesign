@@ -65,6 +65,7 @@ predicate_rule	src/compiler.py	/^def predicate_rule(sym_table, graph, parent_id)
 print_connectives	src/compiler.py	/^def print_connectives():$/;"	f
 print_constants	src/compiler.py	/^def print_constants():$/;"	f
 print_formulae	src/compiler.py	/^def print_formulae():$/;"	f
+print_non_terminals	src/compiler.py	/^def print_non_terminals():$/;"	f
 print_predicates	src/compiler.py	/^def print_predicates(sym_table):$/;"	f
 print_quantifiers	src/compiler.py	/^def print_quantifiers():$/;"	f
 print_terminals	src/compiler.py	/^def print_terminals():$/;"	f

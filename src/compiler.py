@@ -268,8 +268,27 @@ def read_in_file(file_name, sym_table):
 
 
 def print_terminals():
+    print('Terminal symbols:')
+    if VARIABLES:
+        print(*VARIABLES, sep=' ', end=' ')
+    if CONSTANTS:
+        print(*CONSTANTS, sep=' ', end=' ')
+    if QUANTIFIERS:
+        print(*QUANTIFIERS, sep=' ', end=' ')
+    if CONNECTIVES:
+        print(*CONNECTIVES, sep=' ', end=' ')
+    if PREDICATES:
+        print(*PREDICATES, sep=' ', end=' ')
+    print()
 
 
+def print_non_terminals():
+    print('Non-terminal symbols:')
+    print("'Constant' 'Variable'", end=' ')
+    for pred in PREDICATES:
+        print(f"'{pred}_rule'", end=' ')
+    print("'Predicate_rule' 'Equality' 'Quantifier' " +
+          "'Connective' 'Negation' 'Atom' 'Formula'")
 
 
 def print_constants():
@@ -355,10 +374,10 @@ def generate_grammar_lists(sym_table):
     print_constants()
     print_variables()
     print_predicates(sym_table)
-    print('Equality ->', EQUALITY)
+    print('\'Equality\' ->', EQUALITY)
     print_quantifiers()
     print_connectives()
-    print('Negation ->', NEGATION)
+    print('\'Negation\' ->', NEGATION)
     print_formulae()
 
 
