@@ -1,3 +1,4 @@
+import argparse
 import time
 import sys
 import re
@@ -581,14 +582,21 @@ def formula(sym_table, graph, parent_id):
     return True
 
 
-if len(sys.argv) < 2:
-    sys.exit('no input file specified')
 LOG_FILE_NAME = 'log'
-if len(sys.argv) > 2:
-    LOG_FILE_NAME = sys.argv[2]
 PARSE_TREE_NAME = 'parse_tree'
-if len(sys.argv) > 3:
-    PARSE_TREE_NAME = sys.argv[3]
+
+PARSER = argparse.ArgumentParser()
+PARSER.add_argument('-l', '--log', nargs=1, metavar='FILE_NAME',
+                    dest='log_file', help='Filename to write log to')
+PARSER.add_argument('-t', '--tree', nargs=1, metavar='FILE_NAME',
+                    dest='tree_file', help='Filename to write parse tree to')
+PARSER.add_argument('input_file', nargs=1,
+                    metavar='FILE', help='File to parse')
+OPTIONS = PARSER.parse_args()
+if OPTIONS.log_file:
+    LOG_FILE_NAME = OPTIONS.log_file[0]
+if OPTIONS.tree_file:
+    PARSE_TREE_NAME = OPTIONS.tree_file[0]
 SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [
     'SEPARATOR', 'CB'], ',': ['SEPARATOR', 'C']}
 SYM_TABLE.update({'[': ['FORBIDDEN'], ']': ['FORBIDDEN']})
@@ -606,9 +614,9 @@ log_msg(f'Finished grammar generation')
 log_msg(f'Starting Lexical Analysis')
 lex_analysis()
 log_msg(f'Finished Lexical Analysis')
-pgraph = pydot.Dot(graph_type='graph', rankdir='TB')
+PGRAPH = pydot.Dot(graph_type='graph', rankdir='TB')
 log_msg(f'Starting parsing')
-formula(SYM_TABLE, pgraph, -1)
+formula(SYM_TABLE, PGRAPH, -1)
 log_msg(f'Finished parsing')
 if LOOKAHEAD_INDEX != len(TOKENS):
     log_error(f'Syntax error. Formula is valid until position {FORM_INDEX}.' +
@@ -619,6 +627,6 @@ log_msg(f'Formula is valid')
 subgraph = pydot.Subgraph(rank='max')
 for node in TERM_NODES:
     subgraph.add_node(pydot.Node(node))
-pgraph.add_subgraph(subgraph)
+PGRAPH.add_subgraph(subgraph)
 log_msg(f'Saving parse tree to file: {TIME_STR}_{PARSE_TREE_NAME}.png')
-pgraph.write_png(f'{TIME_STR}_{PARSE_TREE_NAME}.png')
+PGRAPH.write_png(f'{TIME_STR}_{PARSE_TREE_NAME}.png')

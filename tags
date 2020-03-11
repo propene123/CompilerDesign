@@ -22,13 +22,16 @@ FORMULA	src/compiler.py	/^FORMULA = ''$/;"	v
 FORM_INDEX	src/compiler.py	/^FORM_INDEX = 0$/;"	v
 INFILE	src/compiler.py	/^INFILE = sys.argv[1]$/;"	v
 LOG_FILE	src/compiler.py	/^LOG_FILE = ''$/;"	v
-LOG_FILE_NAME	src/compiler.py	/^    LOG_FILE_NAME = sys.argv[2]$/;"	v
+LOG_FILE_NAME	src/compiler.py	/^    LOG_FILE_NAME = OPTIONS.log_file[0]$/;"	v
 LOG_FILE_NAME	src/compiler.py	/^LOG_FILE_NAME = 'log'$/;"	v
 LOOKAHEAD_INDEX	src/compiler.py	/^LOOKAHEAD_INDEX = 0$/;"	v
 NEGATION	src/compiler.py	/^NEGATION = ''$/;"	v
 NODE_ID	src/compiler.py	/^NODE_ID = 0$/;"	v
-PARSE_TREE_NAME	src/compiler.py	/^    PARSE_TREE_NAME = sys.argv[3]$/;"	v
+OPTIONS	src/compiler.py	/^OPTIONS = PARSER.parse_args()$/;"	v
+PARSER	src/compiler.py	/^PARSER = argparse.ArgumentParser()$/;"	v
+PARSE_TREE_NAME	src/compiler.py	/^    PARSE_TREE_NAME = OPTIONS.tree_file[0]$/;"	v
 PARSE_TREE_NAME	src/compiler.py	/^PARSE_TREE_NAME = 'parse_tree'$/;"	v
+PGRAPH	src/compiler.py	/^PGRAPH = pydot.Dot(graph_type='graph', rankdir='TB')$/;"	v
 PREDICATES	src/compiler.py	/^PREDICATES = []$/;"	v
 QSTRINGS	src/compiler.py	/^QSTRINGS = ['EXISTS', 'FORALL']$/;"	v
 QUANTIFIERS	src/compiler.py	/^QUANTIFIERS = []$/;"	v
@@ -60,7 +63,6 @@ parse_formula	src/compiler.py	/^def parse_formula(lines, count):$/;"	f
 parse_predicates	src/compiler.py	/^def parse_predicates(line_split, sym_table):$/;"	f
 parse_quantifiers	src/compiler.py	/^def parse_quantifiers(line_split, sym_table):$/;"	f
 parse_variables	src/compiler.py	/^def parse_variables(line_split, sym_table):$/;"	f
-pgraph	src/compiler.py	/^pgraph = pydot.Dot(graph_type='graph', rankdir='TB')$/;"	v
 predicate_rule	src/compiler.py	/^def predicate_rule(sym_table, graph, parent_id):$/;"	f
 print_connectives	src/compiler.py	/^def print_connectives():$/;"	f
 print_constants	src/compiler.py	/^def print_constants():$/;"	f
