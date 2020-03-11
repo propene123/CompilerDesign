@@ -4,4 +4,4 @@ predicates: P[2] Q[1]
 equality: fg
 connectives: \land \lor \implies \iff NOT
 quantifiers: \forall \exists
-formula: (wfgx)
+formula: P(w,x)

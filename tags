@@ -20,7 +20,10 @@ CompilerDesign	README.md	/^# CompilerDesign/;"	c
 EQUALITY	src/compiler.py	/^EQUALITY = ''$/;"	v
 FORMULA	src/compiler.py	/^FORMULA = ''$/;"	v
 FORM_INDEX	src/compiler.py	/^FORM_INDEX = 0$/;"	v
-INFILE	src/compiler.py	/^INFILE = sys.argv[1]$/;"	v
+GRAMMAR_FILE	src/compiler.py	/^GRAMMAR_FILE = ''$/;"	v
+GRAMMAR_FILE_NAME	src/compiler.py	/^    GRAMMAR_FILE_NAME = OPTIONS.grammar_file[0]$/;"	v
+GRAMMAR_FILE_NAME	src/compiler.py	/^GRAMMAR_FILE_NAME = 'grammar'$/;"	v
+INFILE	src/compiler.py	/^INFILE = OPTIONS.input_file[0]$/;"	v
 LOG_FILE	src/compiler.py	/^LOG_FILE = ''$/;"	v
 LOG_FILE_NAME	src/compiler.py	/^    LOG_FILE_NAME = OPTIONS.log_file[0]$/;"	v
 LOG_FILE_NAME	src/compiler.py	/^LOG_FILE_NAME = 'log'$/;"	v
@@ -43,6 +46,7 @@ VARIABLES	src/compiler.py	/^VARIABLES = []$/;"	v
 add_tree	src/compiler.py	/^def add_tree(graph, label, parent_id):$/;"	f
 atom	src/compiler.py	/^def atom(sym_table, graph, parent_id):$/;"	f
 call_program	src/test.py	/^def call_program(py_path, ex_pass=True):$/;"	f
+close_grammar	src/compiler.py	/^def close_grammar():$/;"	f
 close_logger	src/compiler.py	/^def close_logger():$/;"	f
 const_var	src/compiler.py	/^def const_var(graph, parent_id):$/;"	f
 escape_bslash	src/compiler.py	/^def escape_bslash(string):$/;"	f
@@ -51,10 +55,12 @@ gen_sub	src/test.py	/^def gen_sub(sub=True):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 log_error	src/compiler.py	/^def log_error(err_str):$/;"	f
+log_grammar	src/compiler.py	/^def log_grammar(msg_str):$/;"	f
 log_msg	src/compiler.py	/^def log_msg(msg_str):$/;"	f
 main	src/test.py	/^def main():$/;"	f
 match	src/compiler.py	/^def match(terminal):$/;"	f
 match_set	src/compiler.py	/^def match_set(sym_set, index):$/;"	f
+open_grammar	src/compiler.py	/^def open_grammar(path):$/;"	f
 open_logger	src/compiler.py	/^def open_logger(path):$/;"	f
 parse_connectives	src/compiler.py	/^def parse_connectives(line_split, sym_table):$/;"	f
 parse_constants	src/compiler.py	/^def parse_constants(line_split, sym_table):$/;"	f

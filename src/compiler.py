@@ -5,6 +5,7 @@ import re
 import pydot
 
 LOG_FILE = ''
+GRAMMAR_FILE = ''
 CONNSTRINGS = ['AND', 'OR', 'IMPLIES', 'IFF', 'NOT']
 QSTRINGS = ['EXISTS', 'FORALL']
 LOOKAHEAD_INDEX = 0
@@ -51,6 +52,30 @@ def log_msg(msg_str):
     print(msg_str)
     try:
         LOG_FILE.write(f'[MSG] {msg_str}\n')
+    except IOError:
+        sys.exit('Could not write to log file. EXITING.')
+
+
+def open_grammar(path):
+    global GRAMMAR_FILE
+    try:
+        GRAMMAR_FILE = open(path, 'w')
+    except IOError:
+        sys.exit('Could not open log file. EXITING.')
+
+
+def close_grammar():
+    global GRAMMAR_FILE
+    try:
+        GRAMMAR_FILE.close()
+    except IOError:
+        sys.exit('Could not close log file. EXITING.')
+
+
+def log_grammar(msg_str):
+    print(msg_str)
+    try:
+        GRAMMAR_FILE.write(f'{msg_str}\n')
     except IOError:
         sys.exit('Could not write to log file. EXITING.')
 
@@ -269,85 +294,97 @@ def read_in_file(file_name, sym_table):
 
 
 def print_terminals():
-    print('Terminal symbols:')
+    log_grammar('Terminal symbols:')
+    syms = ''
     if VARIABLES:
-        print(*VARIABLES, sep=' ', end=' ')
+        syms += f'{" ".join(VARIABLES)}'
+        syms += ' '
     if CONSTANTS:
-        print(*CONSTANTS, sep=' ', end=' ')
+        syms += f'{" ".join(CONSTANTS)}'
+        syms += ' '
     if QUANTIFIERS:
-        print(*QUANTIFIERS, sep=' ', end=' ')
+        syms += f'{" ".join(QUANTIFIERS)}'
+        syms += ' '
     if CONNECTIVES:
-        print(*CONNECTIVES, sep=' ', end=' ')
+        syms += f'{" ".join(CONNECTIVES)}'
+        syms += ' '
     if PREDICATES:
-        print(*PREDICATES, sep=' ', end=' ')
-    print()
+        syms += f'{" ".join(PREDICATES)}'
+        syms += ' '
+    syms += '( ) ,'
+    log_grammar(syms)
 
 
 def print_non_terminals():
-    print('Non-terminal symbols:')
-    print("'Constant' 'Variable'", end=' ')
+    log_grammar('Non-terminal symbols:')
+    syms = ''
+    syms += "<Constant> <Variable> "
     for pred in PREDICATES:
-        print(f"'{pred}_rule'", end=' ')
-    print("'Predicate_rule' 'Equality' 'Quantifier' " +
-          "'Connective' 'Negation' 'Atom' 'Formula'")
+        syms += f"<{pred}_rule> "
+    syms += ("< Predicate_rule > <Equality > <Quantifier > " +
+             "< Connective > <Negation > <Atom > <Formula >")
+    log_grammar(syms)
 
 
 def print_constants():
-    print('<Constant> -> ', end='')
+    msg_str = ''
+    msg_str += '<Constant> -> '
     if not CONSTANTS:
-        print()
+        log_grammar(msg_str)
         return
-    for i in range(len(CONSTANTS)-1):
-        print(CONSTANTS[i], end='|')
-    print(CONSTANTS[-1])
+    msg_str += f'{"|".join(CONSTANTS)}'
+    log_grammar(msg_str)
 
 
 def print_variables():
-    print('<Variable> -> ', end='')
-    if not VARIABLES:
-        print()
+    msg_str = ''
+    msg_str += '<Variable> -> '
+    if not CONSTANTS:
+        log_grammar(msg_str)
         return
-    for i in range(len(VARIABLES)-1):
-        print(VARIABLES[i], end='|')
-    print(VARIABLES[-1])
+    msg_str += f'{"|".join(VARIABLES)}'
+    log_grammar(msg_str)
 
 
 def print_predicates(sym_table):
+    msg_str = ''
     if not PREDICATES:
-        print()
+        log_grammar('')
         return
     for pred in PREDICATES:
-        print(f'<{pred}_rule> -> {pred}(', end='')
+        msg_str = ''
+        msg_str += f'<{pred}_rule> -> {pred}('
         for _ in range(int(sym_table[pred][1])-1):
-            print('<Variable>', end=',')
-        print('<Variable>)')
-    print('<Predicate_rule> -> ', end='')
+            msg_str += '<Variable>,'
+        msg_str += '<Variable>)'
+        log_grammar(msg_str)
+    msg_str = '<Predicate_rule> -> '
     for i in range(len(PREDICATES)-1):
-        print(f'<{PREDICATES[i]}_rule>', end='|')
-    print(f'<{PREDICATES[-1]}_rule>')
+        msg_str += f'<{PREDICATES[i]}_rule>|'
+    msg_str += f'<{PREDICATES[-1]}_rule>'
+    log_grammar(msg_str)
 
 
 def print_quantifiers():
-    print('<Quantifier> -> ', end='')
-    for i in range(len(QUANTIFIERS)-1):
-        print(QUANTIFIERS[i], end='|')
-    print(QUANTIFIERS[-1])
+    msg_str = ''
+    msg_str += '<Quantifier> -> '
+    msg_str += f'{"|".join(QUANTIFIERS)}'
+    log_grammar(msg_str)
 
 
 def print_connectives():
-    print('<Connective> -> ', end='')
-    for i in range(len(CONNECTIVES)-1):
-        print(CONNECTIVES[i], end='|')
-    print(CONNECTIVES[-1])
+    msg_str = ''
+    msg_str += '<Connective> -> '
+    msg_str += f'{"|".join(CONNECTIVES)}'
 
 
 def print_formulae():
-    print('<Atom> -> <Predicate_rule>|(<Constant><Equality>' +
-          '<Constant>)|(<Constant><Equality><Variable>)|(' +
-          '<Variable><Equality><Constant>)|(<Variable>' +
-          '<Equality><Variable>)')
-    print('<Formula> -> <Atom>|(<Formula><Connective><Formula>)|' +
-          '<Negation><Formula>|<Quantifier><Formula>')
+    log_grammar('<Atom> -> <Predicate_rule>|(<Constant><Equality>' +
+                '<Constant>)|(<Constant><Equality><Variable>)|(' +
+                '<Variable><Equality><Constant>)|(<Variable>' +
+                '<Equality><Variable>)')
+    log_grammar('<Formula> -> <Atom>|(<Formula><Connective><Formula>)|' +
+                '<Negation><Formula>|<Quantifier><Formula>')
 
 
 def generate_grammar_lists(sym_table):
@@ -368,18 +405,25 @@ def generate_grammar_lists(sym_table):
                 NEGATION = sym
             else:
                 CONNECTIVES.append(sym)
-    print('Grammar for first order logic formula')
+    time_str = time.strftime('%Y-%m-%d_%H-%M-%S')
+    log_msg(f'Opening grammar output file at {time_str}_' +
+            f'{GRAMMAR_FILE_NAME}.txt')
+    open_grammar(f'{time_str}_{GRAMMAR_FILE_NAME}.txt')
+    log_msg('Writing grammar to grammar output file')
+    log_grammar('Grammar for first order logic formula')
     print_terminals()
     print_non_terminals()
-    print('Production rules for the first order logic language.')
+    log_grammar('Production rules for the first order logic language.')
     print_constants()
     print_variables()
     print_predicates(sym_table)
-    print('<Equality> ->', EQUALITY)
+    log_grammar('<Equality> -> ' + EQUALITY)
     print_quantifiers()
     print_connectives()
-    print('<Negation> ->', NEGATION)
+    log_grammar('<Negation> -> ' + NEGATION)
     print_formulae()
+    log_msg('Closing grammar output file')
+    close_grammar()
 
 
 def match_set(sym_set, index):
@@ -424,9 +468,23 @@ def lex_analysis():
 def add_tree(graph, label, parent_id):
     global NODE_ID
     if (label in ('Quantifier', 'Connective', 'Variable',
-                  'Constant', 'Predicate', 'Negation', 'Equality')):
+                  'Constant', 'Negation', 'Equality')):
         graph.add_node(pydot.Node(NODE_ID, label=f'"<{label}>"'))
         graph.add_edge(pydot.Edge(parent_id, NODE_ID))
+        NODE_ID += 1
+        graph.add_node(pydot.Node(
+            NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
+        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
+        TERM_NODES.append(NODE_ID)
+        NODE_ID += 1
+    elif label == 'Predicate':
+        graph.add_node(pydot.Node(NODE_ID, label=f'"<{label}>"'))
+        graph.add_edge(pydot.Edge(parent_id, NODE_ID))
+        NODE_ID += 1
+        graph.add_node(pydot.Node(
+            NODE_ID, label=f'"<{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}' +
+            f'_rule>"'))
+        graph.add_edge(pydot.Edge(NODE_ID-1, NODE_ID))
         NODE_ID += 1
         graph.add_node(pydot.Node(
             NODE_ID, label=f'"{escape_bslash(TOKENS[LOOKAHEAD_INDEX-1][1])}"'))
@@ -512,7 +570,7 @@ def const_var(graph, parent_id):
 
 def atom(sym_table, graph, parent_id):
     global NODE_ID, TERM_NODES
-    add_tree(graph, 'Atom', parent_id)
+    add_tree(graph, '<Atom>', parent_id)
     start_id = NODE_ID - 1
     if LOOKAHEAD_INDEX == len(TOKENS):
         log_error(f'Syntax Error. Expected Atom at formula position {FORM_INDEX}.' +
@@ -583,6 +641,7 @@ def formula(sym_table, graph, parent_id):
 
 
 LOG_FILE_NAME = 'log'
+GRAMMAR_FILE_NAME = 'grammar'
 PARSE_TREE_NAME = 'parse_tree'
 
 PARSER = argparse.ArgumentParser()
@@ -590,6 +649,8 @@ PARSER.add_argument('-l', '--log', nargs=1, metavar='FILE_NAME',
                     dest='log_file', help='Filename to write log to')
 PARSER.add_argument('-t', '--tree', nargs=1, metavar='FILE_NAME',
                     dest='tree_file', help='Filename to write parse tree to')
+PARSER.add_argument('-p', '--parse', nargs=1, metavar='FILE_NAME',
+                    dest='grammar_file', help='Filename to write grammar to')
 PARSER.add_argument('input_file', nargs=1,
                     metavar='FILE', help='File to parse')
 OPTIONS = PARSER.parse_args()
@@ -597,14 +658,16 @@ if OPTIONS.log_file:
     LOG_FILE_NAME = OPTIONS.log_file[0]
 if OPTIONS.tree_file:
     PARSE_TREE_NAME = OPTIONS.tree_file[0]
+if OPTIONS.grammar_file:
+    GRAMMAR_FILE_NAME = OPTIONS.grammar_file[0]
 SYM_TABLE = {'(': ['SEPARATOR', 'OB'], ')': [
     'SEPARATOR', 'CB'], ',': ['SEPARATOR', 'C']}
 SYM_TABLE.update({'[': ['FORBIDDEN'], ']': ['FORBIDDEN']})
-INFILE = sys.argv[1]
+INFILE = OPTIONS.input_file[0]
 TIME_STR = time.strftime('%Y-%m-%d_%H-%M-%S')
 open_logger(f'{TIME_STR}_{LOG_FILE_NAME}.txt')
 log_msg(f'Created logfile called {TIME_STR}_{LOG_FILE_NAME}.txt')
-log_msg(f'Starting read in file')
+log_msg(f'Starting read in file {INFILE}')
 read_in_file(INFILE, SYM_TABLE)
 log_msg(f'Finished Reading in file. Input file was valid')
 log_msg(f'Whitespace stripped formula used for error messages: {FORMULA}')
