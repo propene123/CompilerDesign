@@ -1,8 +1,7 @@
-variables: w x y z
+variables: w x z
 constants: C D
 predicates: P[2] Q[1]
-equality: =
+equality: fg
 connectives: \land \lor \implies \iff NOT
 quantifiers: \forall \exists
-formula: ( ( \forallx\existsy(x = y) 
-\implies  NOT\existsx (x = D)  ) \land \forallx\forally(y = x) )
+formula: (wfgx)

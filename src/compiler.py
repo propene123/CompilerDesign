@@ -292,7 +292,7 @@ def print_non_terminals():
 
 
 def print_constants():
-    print('\'Constant\' -> ', end='')
+    print('<Constant> -> ', end='')
     if not CONSTANTS:
         print()
         return
@@ -302,7 +302,7 @@ def print_constants():
 
 
 def print_variables():
-    print('\'Variable\' -> ', end='')
+    print('<Variable> -> ', end='')
     if not VARIABLES:
         print()
         return
@@ -316,37 +316,37 @@ def print_predicates(sym_table):
         print()
         return
     for pred in PREDICATES:
-        print(f'\'{pred}_rule\' -> {pred}(', end='')
+        print(f'<{pred}_rule> -> {pred}(', end='')
         for _ in range(int(sym_table[pred][1])-1):
-            print('\'Variable\'', end=',')
-        print('\'Variable\')')
-    print('\'Predicate_rule\' -> ', end='')
+            print('<Variable>', end=',')
+        print('<Variable>)')
+    print('<Predicate_rule> -> ', end='')
     for i in range(len(PREDICATES)-1):
-        print(f'\'{PREDICATES[i]}_rule\'', end='|')
-    print(f'\'{PREDICATES[-1]}_rule\'')
+        print(f'<{PREDICATES[i]}_rule>', end='|')
+    print(f'<{PREDICATES[-1]}_rule>')
 
 
 def print_quantifiers():
-    print('\'Quantifier\' -> ', end='')
+    print('<Quantifier> -> ', end='')
     for i in range(len(QUANTIFIERS)-1):
         print(QUANTIFIERS[i], end='|')
     print(QUANTIFIERS[-1])
 
 
 def print_connectives():
-    print('\'Connective\' -> ', end='')
+    print('<Connective> -> ', end='')
     for i in range(len(CONNECTIVES)-1):
         print(CONNECTIVES[i], end='|')
     print(CONNECTIVES[-1])
 
 
 def print_formulae():
-    print('\'Atom\' -> \'Predicate_rule\'|(\'Constant\'\'Equality\'' +
-          '\'Constant\')|(\'Constant\'\'Equality\'\'Variable\')|(' +
-          '\'Variable\'\'Equality\'\'Constant\')|(\'Variable\'' +
-          '\'Equality\'\'Variable\')')
-    print('\'Formula\' -> \'Atom\'|(\'Formula\'\'Connective\'\'Formula\')|' +
-          '\'Negation\'\'Formula\'|\'Quantifier\'\'Formula\'')
+    print('<Atom> -> <Predicate_rule>|(<Constant><Equality>' +
+          '<Constant>)|(<Constant><Equality><Variable>)|(' +
+          '<Variable><Equality><Constant>)|(<Variable>' +
+          '<Equality><Variable>)')
+    print('<Formula> -> <Atom>|(<Formula><Connective><Formula>)|' +
+          '<Negation><Formula>|<Quantifier><Formula>')
 
 
 def generate_grammar_lists(sym_table):
@@ -374,10 +374,10 @@ def generate_grammar_lists(sym_table):
     print_constants()
     print_variables()
     print_predicates(sym_table)
-    print('\'Equality\' ->', EQUALITY)
+    print('<Equality> ->', EQUALITY)
     print_quantifiers()
     print_connectives()
-    print('\'Negation\' ->', NEGATION)
+    print('<Negation> ->', NEGATION)
     print_formulae()
 
 
@@ -424,7 +424,7 @@ def add_tree(graph, label, parent_id):
     global NODE_ID
     if (label in ('Quantifier', 'Connective', 'Variable',
                   'Constant', 'Predicate', 'Negation', 'Equality')):
-        graph.add_node(pydot.Node(NODE_ID, label=f'"\'{label}\'"'))
+        graph.add_node(pydot.Node(NODE_ID, label=f'"<{label}>"'))
         graph.add_edge(pydot.Edge(parent_id, NODE_ID))
         NODE_ID += 1
         graph.add_node(pydot.Node(
@@ -433,7 +433,7 @@ def add_tree(graph, label, parent_id):
         TERM_NODES.append(NODE_ID)
         NODE_ID += 1
     elif label == 'Formula':
-        graph.add_node(pydot.Node(NODE_ID, label=f'"\'{label}\'"'))
+        graph.add_node(pydot.Node(NODE_ID, label=f'"<{label}>"'))
         if parent_id > -1:
             graph.add_edge(pydot.Edge(parent_id, NODE_ID))
         NODE_ID += 1
