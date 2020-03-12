@@ -1,7 +1,8 @@
-variables: w x z
+variables: w x z weqx
 constants: C D
 predicates: P[2] Q[1]
-equality: fg
+equality: eq
 connectives: \land \lor \implies \iff NOT
 quantifiers: \forall \exists
-formula: P(w,x)
+formula: (       weqx           
+               )

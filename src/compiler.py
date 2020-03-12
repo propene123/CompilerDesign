@@ -201,12 +201,12 @@ def parse_formula(lines, count):
     split = lines[count].split(':')
     if len(split) != 2:
         log_error('You must specify a formula in the input file')
-    FORMULA = ''.join(split[1].split())
+    FORMULA = ' '.join(split[1].split()).strip()
     if len(FORMULA) == 0:
         log_error('You must specify a formula in the input file')
     for i in range(count + 1, len(lines)):
         if len(lines[i].split(':')) == 1:
-            FORMULA += ''.join(lines[i].split())
+            FORMULA += ' '.join(lines[i].split()).strip()
             skip += 1
         else:
             break
@@ -438,15 +438,22 @@ def match_set(sym_set, index):
 def lex_analysis():
     global TOKENS
     i = 0
+    leading_space = 0
     while i < len(FORMULA):
         if FORMULA[i] == '(':
-            TOKENS.append(['(', '('])
+            TOKENS.append(['(', '(', leading_space])
+            leading_space = 0
             i += 1
         elif FORMULA[i] == ')':
-            TOKENS.append([')', ')'])
+            TOKENS.append([')', ')', leading_space])
+            leading_space = 0
             i += 1
         elif FORMULA[i] == ',':
-            TOKENS.append([',', ','])
+            TOKENS.append([',', ',', leading_space])
+            leading_space = 0
+            i += 1
+        elif FORMULA[i].isspace():
+            leading_space += 1
             i += 1
         else:
             candidates = []
@@ -461,7 +468,9 @@ def lex_analysis():
             if len(candidates[0][0]) == 0:
                 log_error('Formula contains invalid identifiers')
             else:
-                TOKENS.append([candidates[0][1], candidates[0][0]])
+                TOKENS.append(
+                    [candidates[0][1], candidates[0][0], leading_space])
+                leading_space = 0
                 i += len(candidates[0][0])
 
 
@@ -509,6 +518,8 @@ def match(terminal):
                   f' {FORM_INDEX}. Instead found nothing.')
     if terminal == TOKENS[LOOKAHEAD_INDEX][0]:
         FORM_INDEX += len(TOKENS[LOOKAHEAD_INDEX][1])
+        if LOOKAHEAD_INDEX < len(TOKENS) - 1:
+            FORM_INDEX += TOKENS[LOOKAHEAD_INDEX+1][2]
         LOOKAHEAD_INDEX += 1
     else:
         log_error(f'Syntax Error. Expected {terminal} at formula position ' +
@@ -670,7 +681,7 @@ log_msg(f'Created logfile called {TIME_STR}_{LOG_FILE_NAME}.txt')
 log_msg(f'Starting read in file {INFILE}')
 read_in_file(INFILE, SYM_TABLE)
 log_msg(f'Finished Reading in file. Input file was valid')
-log_msg(f'Whitespace stripped formula used for error messages: {FORMULA}')
+log_msg(f'Formula used for error messages: {FORMULA}')
 log_msg(f'Starting grammar generation')
 generate_grammar_lists(SYM_TABLE)
 log_msg(f'Finished grammar generation')
