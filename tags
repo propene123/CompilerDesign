@@ -53,6 +53,7 @@ escape_bslash	src/compiler.py	/^def escape_bslash(string):$/;"	f
 formula	src/compiler.py	/^def formula(sym_table, graph, parent_id):$/;"	f
 gen_sub	src/test.py	/^def gen_sub(sub=True):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
+kek	src/hmm.py	/^kek = ''$/;"	v
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 log_error	src/compiler.py	/^def log_error(err_str):$/;"	f
 log_grammar	src/compiler.py	/^def log_grammar(msg_str):$/;"	f

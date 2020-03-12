@@ -308,6 +308,10 @@ def print_terminals():
     if CONNECTIVES:
         syms += f'{" ".join(CONNECTIVES)}'
         syms += ' '
+    if NEGATION:
+        syms += f'{NEGATION} '
+    if EQUALITY:
+        syms += f'{EQUALITY} '
     if PREDICATES:
         syms += f'{" ".join(PREDICATES)}'
         syms += ' '
@@ -321,8 +325,8 @@ def print_non_terminals():
     syms += "<Constant> <Variable> "
     for pred in PREDICATES:
         syms += f"<{pred}_rule> "
-    syms += ("< Predicate_rule > <Equality > <Quantifier > " +
-             "< Connective > <Negation > <Atom > <Formula >")
+    syms += ("<Predicate_rule> <Equality> <Quantifier > " +
+             "<Connective> <Negation> <Atom> <Formula>")
     log_grammar(syms)
 
 
@@ -376,6 +380,7 @@ def print_connectives():
     msg_str = ''
     msg_str += '<Connective> -> '
     msg_str += f'{"|".join(CONNECTIVES)}'
+    log_grammar(msg_str)
 
 
 def print_formulae():
