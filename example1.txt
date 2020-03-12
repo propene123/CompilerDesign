@@ -1,4 +1,4 @@
-formula: E
+formula: ((price==cost1)ANDSame(price,cost1)) 
 equality: ==
 connectives: AND OR IMPLIES IFF NOT
 quantifiers: E A

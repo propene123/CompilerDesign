@@ -34,7 +34,7 @@ OPTIONS	src/compiler.py	/^OPTIONS = PARSER.parse_args()$/;"	v
 PARSER	src/compiler.py	/^PARSER = argparse.ArgumentParser()$/;"	v
 PARSE_TREE_NAME	src/compiler.py	/^    PARSE_TREE_NAME = OPTIONS.tree_file[0]$/;"	v
 PARSE_TREE_NAME	src/compiler.py	/^PARSE_TREE_NAME = 'parse_tree'$/;"	v
-PGRAPH	src/compiler.py	/^PGRAPH = pydot.Dot(graph_type='graph', rankdir='TB')$/;"	v
+PGRAPH	src/compiler.py	/^PGRAPH = pydot.Dot(graph_type='graph', dpi='300', rankdir='TB')$/;"	v
 PREDICATES	src/compiler.py	/^PREDICATES = []$/;"	v
 QSTRINGS	src/compiler.py	/^QSTRINGS = ['EXISTS', 'FORALL']$/;"	v
 QUANTIFIERS	src/compiler.py	/^QUANTIFIERS = []$/;"	v
@@ -53,7 +53,6 @@ escape_bslash	src/compiler.py	/^def escape_bslash(string):$/;"	f
 formula	src/compiler.py	/^def formula(sym_table, graph, parent_id):$/;"	f
 gen_sub	src/test.py	/^def gen_sub(sub=True):$/;"	f
 generate_grammar_lists	src/compiler.py	/^def generate_grammar_lists(sym_table):$/;"	f
-kek	src/hmm.py	/^kek = 'form:'$/;"	v
 lex_analysis	src/compiler.py	/^def lex_analysis():$/;"	f
 log_error	src/compiler.py	/^def log_error(err_str):$/;"	f
 log_grammar	src/compiler.py	/^def log_grammar(msg_str):$/;"	f
