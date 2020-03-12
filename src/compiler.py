@@ -202,14 +202,14 @@ def parse_formula(lines, count):
     if len(split) != 2:
         log_error('You must specify a formula in the input file')
     FORMULA = ' '.join(split[1].split()).strip()
-    if len(FORMULA) == 0:
-        log_error('You must specify a formula in the input file')
     for i in range(count + 1, len(lines)):
         if len(lines[i].split(':')) == 1:
             FORMULA += ' '.join(lines[i].split()).strip()
             skip += 1
         else:
             break
+    if len(FORMULA) == 0:
+        log_error('You must specify a formula in the input file')
     return skip
 
 
